@@ -24,6 +24,7 @@
   'tray.tooltip.ambientRoom': 'Ambiente com {room} °C',
   'tray.tooltip.humidity': 'Umidade do ambiente em {humidity}%',
 
+  'tray.menu.update': 'Baixar a versão {version}…',
   'tray.menu.open': 'Abrir painel',
   'tray.menu.signIn': 'Entrar na conta Samsung',
   'tray.menu.waiting': 'Aguardando o login no navegador…',
@@ -66,6 +67,7 @@
   'main.favorites': 'Favoritos',
   'main.timer': 'Timer',
   'main.openSettings': 'Abrir ajustes',
+  'main.openSettingsUpdate': 'Abrir ajustes (nova versão disponível)',
 
   'login.title': 'Entre na conta Samsung',
   'login.text': 'O navegador vai abrir para você entrar pelo login oficial do SmartThings.',
@@ -175,6 +177,10 @@
   'settings.advancedNote': 'Noite tropical, limpeza e diagnóstico',
   'settings.prefsNote': 'Avisos, atalho e ícone da barra',
 
+  'update.available': 'Versão {version} disponível',
+  'update.note': 'Abre a página de download',
+  'update.download': 'Baixar',
+
   'filter.title': 'Filtro',
   'filter.noReading': 'Sem leitura do filtro',
   'filter.wash': 'Hora de lavar',
@@ -279,6 +285,8 @@
   'prefs.shortcutError': 'Combinação em uso ou inválida.',
   'prefs.roomIcon': 'Mostrar a temperatura ambiente no ícone',
   'prefs.dock': 'Mostrar o ícone no Dock',
+  'prefs.updates': 'Procurar versões novas',
+  'prefs.updatesNote': 'Consulta o GitHub uma vez por dia',
   'prefs.language': 'Idioma',
   'prefs.languageAuto': 'Automático',
 });

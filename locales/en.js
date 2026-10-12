@@ -24,6 +24,7 @@
   'tray.tooltip.ambientRoom': 'Room at {room} °C',
   'tray.tooltip.humidity': 'Room humidity at {humidity}%',
 
+  'tray.menu.update': 'Download version {version}…',
   'tray.menu.open': 'Open panel',
   'tray.menu.signIn': 'Sign in to your Samsung account',
   'tray.menu.waiting': 'Waiting for sign-in in the browser…',
@@ -66,6 +67,7 @@
   'main.favorites': 'Favorites',
   'main.timer': 'Timer',
   'main.openSettings': 'Open settings',
+  'main.openSettingsUpdate': 'Open settings (new version available)',
 
   'login.title': 'Sign in to your Samsung account',
   'login.text': 'Your browser will open so you can sign in with the official SmartThings login.',
@@ -175,6 +177,10 @@
   'settings.advancedNote': 'Tropical night, cleaning and diagnostics',
   'settings.prefsNote': 'Alerts, shortcut and bar icon',
 
+  'update.available': 'Version {version} available',
+  'update.note': 'Opens the download page',
+  'update.download': 'Download',
+
   'filter.title': 'Filter',
   'filter.noReading': 'No filter reading',
   'filter.wash': 'Time to wash',
@@ -279,6 +285,8 @@
   'prefs.shortcutError': 'Shortcut in use or invalid.',
   'prefs.roomIcon': 'Show room temperature in the icon',
   'prefs.dock': 'Show the icon in the Dock',
+  'prefs.updates': 'Check for new versions',
+  'prefs.updatesNote': 'Asks GitHub once a day',
   'prefs.language': 'Language',
   'prefs.languageAuto': 'Automatic',
 });

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, Tray, ipcMain, nativeImage, nativeTheme, powerMonitor, screen } = require('electron');
+const { app, BrowserWindow, Menu, Tray, ipcMain, nativeImage, nativeTheme, powerMonitor, screen, shell } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 const { AcBridge } = require('./bridge');
@@ -12,6 +12,8 @@ const { Scheduler } = require('./lib/scheduler');
 const { SettingsStore } = require('./lib/settings');
 const { Shortcut } = require('./lib/shortcut');
 const { menuTemplate, tooltipFor } = require('./lib/tray-menu');
+const { UpdateChecker } = require('./lib/updates');
+const { repository } = require('./package.json');
 
 const IS_MAC = process.platform === 'darwin';
 // The window leaves room around the panel for its shadow; on macOS the top margin is thinner so it hugs the menu bar.
@@ -33,6 +35,7 @@ let favorites;
 let scheduler;
 let notifier;
 let shortcut;
+let updates;
 let i18n;
 let tray;
 let panel;
@@ -229,7 +232,8 @@ function updateMenu(force = false) {
   const view = bridge.view();
   const { favoritos } = settings.get();
   const autostart = isAutostartEnabled();
-  const key = JSON.stringify([view.device?.ligado, Boolean(view.device), view.login, favoritos.map(({ id, nome }) => [id, nome]), autostart, i18n.language]);
+  const update = updates.notice;
+  const key = JSON.stringify([view.device?.ligado, Boolean(view.device), view.login, favoritos.map(({ id, nome }) => [id, nome]), autostart, update?.versao, i18n.language]);
   if (!force && key === menuKey) return;
   menuKey = key;
   contextMenu = Menu.buildFromTemplate(
@@ -237,9 +241,11 @@ function updateMenu(force = false) {
       view,
       favoritos,
       autostart,
+      update,
       i18n,
       actions: {
         showPanel,
+        openUpdate,
         login: () => bridge.login(),
         cancelLogin: () => bridge.cancelLogin(),
         setPower: (on) => setByHand('ligado', on),
@@ -269,6 +275,16 @@ function applyFavoriteByHand(id) {
 // A change made a moment ago may still be waiting to go out or be on its way; the bridge would kill it on the way out.
 function commandsOnTheWay() {
   return bridge.view().syncing || scheduler.busy;
+}
+
+async function openUpdate() {
+  const url = updates.downloadPage();
+  if (!url) return;
+  try {
+    await shell.openExternal(url);
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function languageSetting() {
@@ -311,9 +327,11 @@ function start() {
     if (next.idioma !== previous.idioma) applyLanguage();
     if (next.autostart !== previous.autostart) setAutostart(next.autostart);
     if (IS_MAC && next.dock !== previous.dock) applyDock(next.dock);
+    if (next.atualizacoes !== previous.atualizacoes) updates.setEnabled(next.atualizacoes);
     updateMenu();
   });
   i18n = createI18n(languageSetting());
+  updates = new UpdateChecker({ repository, version: app.getVersion() });
   if (IS_MAC) applyDock(settings.get().dock);
   history = new History(path.join(app.getPath('userData'), 'historico.json'));
   favorites = new Favorites({ settings, bridge });
@@ -346,8 +364,12 @@ function start() {
     history.record(view);
     notifier.check(view);
   });
+  updates.on('change', (notice) => {
+    panel.webContents.send('update', notice);
+    updateMenu();
+  });
 
-  ipcMain.handle('state:get', () => ({ view: bridge.view(), darkTaskbar: taskbarIsDark(), settings: settings.get(), locale: i18n.language }));
+  ipcMain.handle('state:get', () => ({ view: bridge.view(), darkTaskbar: taskbarIsDark(), settings: settings.get(), locale: i18n.language, update: updates.notice }));
   ipcMain.handle('autostart:get', isAutostartEnabled);
   ipcMain.on('autostart:set', (_event, enabled) => settings.update({ autostart: enabled }));
   ipcMain.on('ac:set', (_event, key, value) => setByHand(key, value));
@@ -371,6 +393,7 @@ function start() {
   ipcMain.handle('schedule:save', (_event, agenda) => scheduler.saveSchedule(agenda));
   ipcMain.handle('schedule:delete', (_event, id) => scheduler.deleteSchedule(id));
   ipcMain.handle('history:get', () => history.get(bridge.view().device?.id));
+  ipcMain.on('update:open', openUpdate);
   ipcMain.on('panel:hide', hidePanel);
   ipcMain.on('tray:icon', (_event, images) => {
     const { width } = tray.getBounds();
@@ -382,6 +405,7 @@ function start() {
   powerMonitor.on('resume', () => {
     if (!bridge.paused) bridge.refresh();
     scheduler.check();
+    updates.resume();
   });
   app.on('second-instance', showPanel);
   // Opening the app again from Finder is the way in when the menu bar has no room for the icon.
@@ -401,6 +425,7 @@ function start() {
   app.on('will-quit', () => {
     scheduler.stop();
     notifier.stop();
+    updates.stop();
     shortcut.dispose();
     history.flush();
     bridge.dispose();
@@ -419,6 +444,7 @@ function start() {
   schedulePoll();
   scheduler.start();
   notifier.start();
+  updates.start(settings.get().atualizacoes);
 }
 
 if (app.requestSingleInstanceLock()) {

@@ -1,10 +1,12 @@
 // Entry point: renders from the two sources of truth (the bridge view and the settings) and subscribes to them.
 
 let settingsReceived = false;
+let updateReceived = false;
 
 function render() {
   renderMain();
   renderSettings();
+  renderUpdate();
   renderTrayIcon();
   const device = view?.device;
   const popupInputs = [settings.favoritos, settings.timer, Boolean(device), device?.ligado, device?.modo, device?.vento];
@@ -57,6 +59,12 @@ window.ac.onSettings((next) => {
   render();
 });
 
+window.ac.onUpdate((next) => {
+  updateReceived = true;
+  applyUpdate(next);
+  renderUpdate();
+});
+
 document.documentElement.dataset.platform = window.ac.platform;
 if (IS_MAC) {
   byId('autostart-title').dataset.i18n = 'autostart.mac';
@@ -75,6 +83,7 @@ window.ac.getState().then((initial) => {
   darkTaskbar = initial.darkTaskbar;
   view ??= initial.view;
   if (!settingsReceived) applySettings(initial.settings);
+  if (!updateReceived) applyUpdate(initial.update);
   if (initial.locale) setLocale(initial.locale);
   render();
 });

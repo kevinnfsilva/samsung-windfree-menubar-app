@@ -242,6 +242,14 @@
 
         <div class="pages">
           <section class="page active" id="page-root" data-title-key="page.root">
+            <div class="group" id="group-update" hidden>
+              <div class="row">
+                <i data-lucide="circle-arrow-down"></i>
+                <span class="row-text"><span class="row-title" id="update-title"></span><span class="row-note" data-i18n="update.note"></span></span>
+                <button class="btn btn-small btn-primary" id="update-download" type="button" aria-describedby="update-title" data-i18n="update.download"></button>
+              </div>
+            </div>
+
             <div class="group">
               <button class="row row-link" id="row-device" type="button" data-go="device">
                 <i data-lucide="thermometer-snowflake"></i>
@@ -479,6 +487,11 @@
                 <span class="row-text"><span class="row-title" data-i18n="prefs.dock"></span></span>
                 <button class="switch" type="button" role="switch" aria-checked="false" data-pref="dock" data-i18n-aria-label="prefs.dock"></button>
               </div>
+              <div class="row">
+                <i data-lucide="refresh-cw"></i>
+                <span class="row-text"><span class="row-title" data-i18n="prefs.updates"></span><span class="row-note" data-i18n="prefs.updatesNote"></span></span>
+                <button class="switch" type="button" role="switch" aria-checked="false" data-pref="atualizacoes" data-i18n-aria-label="prefs.updates"></button>
+              </div>
               <div class="row row-wide">
                 <i data-lucide="languages"></i>
                 <span class="row-text"><span class="row-title" data-i18n="prefs.language"></span></span>
@@ -511,6 +524,7 @@
     <script src="page-schedules.js"></script>
     <script src="page-advanced.js"></script>
     <script src="page-prefs.js"></script>
+    <script src="updates.js"></script>
     <script src="keyboard.js"></script>
     <script src="app.js"></script>
   </body>

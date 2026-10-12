@@ -1079,13 +1079,13 @@ svg.lucide {
   font-size: 16px;
 }
 
-/* A dot on the clock tells that a timer is running. */
-.icon-button[data-active='true'] {
+/* A dot on the clock tells that a timer is running, one on the settings button that a new version is out. */
+.icon-button:is([data-active='true'], [data-update='true']) {
   position: relative;
   color: var(--porcelain);
 }
 
-.icon-button[data-active='true']::after {
+.icon-button:is([data-active='true'], [data-update='true'])::after {
   content: '';
   position: absolute;
   top: 7px;
@@ -1095,6 +1095,10 @@ svg.lucide {
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 0 2px var(--graphite);
+}
+
+.icon-button[data-update='true']::after {
+  background: var(--frost);
 }
 
 /* Option menu */

@@ -8,10 +8,13 @@ const DEFAULT_SETTINGS = {
   timer: null,
   agendas: [],
   idioma: 'auto',
+  atualizacoes: true,
 };
 
 let view = null;
 let settings = DEFAULT_SETTINGS;
+// The newer release the main process knows about, { versao, url }, or null.
+let updateNotice = null;
 let darkTaskbar = true;
 
 // A missing group or field must never crash a render: fill it from the defaults.
@@ -23,6 +26,11 @@ function applySettings(next) {
     icone: { ...DEFAULT_SETTINGS.icone, ...next?.icone },
     notificacoes: { ...DEFAULT_SETTINGS.notificacoes, ...next?.notificacoes },
   };
+}
+
+// Like applySettings: whatever arrives, the render only ever sees null or a notice that has a version to show.
+function applyUpdate(next) {
+  updateNotice = typeof next?.versao === 'string' && next.versao ? next : null;
 }
 
 function loginState() {

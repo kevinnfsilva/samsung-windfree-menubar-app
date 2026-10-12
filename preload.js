@@ -28,10 +28,12 @@ contextBridge.exposeInMainWorld('ac', {
   saveSchedule: (agenda) => ipcRenderer.invoke('schedule:save', agenda),
   deleteSchedule: (id) => ipcRenderer.invoke('schedule:delete', id),
   getHistory: () => ipcRenderer.invoke('history:get'),
+  openUpdate: () => ipcRenderer.send('update:open'),
   onState: (callback) => listen('state', callback),
   onSettings: (callback) => listen('settings', callback),
   onTheme: (callback) => listen('theme', callback),
   onLocale: (callback) => listen('locale', callback),
+  onUpdate: (callback) => listen('update', callback),
   onShow: (callback) => listen('panel:show', callback),
   onHide: (callback) => listen('panel:hide', callback),
 });

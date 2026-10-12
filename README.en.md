@@ -4,6 +4,30 @@
   <img src="build/icon.png" width="128" height="128" alt="WindFree icon" />
   <h1>WindFree</h1>
   <p>Control your Samsung WindFree air conditioner from the Mac menu bar or the Windows tray.</p>
+</div>
+
+<p align="center">
+  <a href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest/download/WindFree-arm64.dmg"><img src="docs/btn-download-arm64.en.svg" width="300" alt="Download for Apple Silicon (M1 or newer)" /></a>
+  &nbsp;
+  <a href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest/download/WindFree-x64.dmg"><img src="docs/btn-download-x64.en.svg" width="300" alt="Download for Intel" /></a>
+</p>
+
+<p align="center">
+  <sub>Not sure which Mac you have? Apple menu &gt; <b>About This Mac</b>: "Chip" means Apple Silicon, "Processor" means Intel. Needs macOS 13 or newer. For Windows, see <a href="#on-windows">On Windows</a>.</sub>
+</p>
+
+<p align="center">
+  <a href="https://kevinnfsilva.github.io/samsung-windfree-menubar-app/">Download page</a> ·
+  <a href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest">Release notes</a>
+</p>
+
+<p align="center">Prefer to install without the macOS warning? Paste this line into Terminal:</p>
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/kevinnfsilva/samsung-windfree-menubar-app/main/install.sh | bash
+```
+
+<div align="center">
   <p>
     <a href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest"><img src="https://img.shields.io/github/v/release/kevinnfsilva/samsung-windfree-menubar-app?label=version" alt="Latest version" /></a>
     <img src="https://img.shields.io/badge/macOS-13%2B-111111?logo=apple&logoColor=white" alt="macOS 13 or newer" />
@@ -44,22 +68,38 @@ You need:
 
 You do not need to install Node.js: the installed app brings everything it uses.
 
-Download the installer from the [latest release](https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest):
+Pick the file for your Mac. The links always point to the latest release:
 
 | Your Mac | File |
 |---|---|
-| Apple Silicon (M1 or newer) | the one ending in `-arm64.dmg` |
-| Intel | the one ending in `-x64.dmg` |
+| Apple Silicon (M1 or newer) | [`WindFree-arm64.dmg`](https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest/download/WindFree-arm64.dmg) |
+| Intel | [`WindFree-x64.dmg`](https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest/download/WindFree-x64.dmg) |
 
 Not sure? Open the Apple menu and choose **About This Mac**. If it says "Chip", it is Apple Silicon. If it says "Processor", it is Intel.
 
-### Install
+The same choices, with explanations, are on the [download page](https://kevinnfsilva.github.io/samsung-windfree-menubar-app/). There are two ways to install: from the Terminal, without the macOS warning, or by opening the DMG.
+
+### Install from Terminal (no warnings)
+
+Paste this line into Terminal (in Applications > Utilities) and press Return:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/kevinnfsilva/samsung-windfree-menubar-app/main/install.sh | bash
+```
+
+The script downloads the right DMG for your Mac (Apple Silicon or Intel), checks that it holds WindFree, copies the app into the **Applications** folder and opens it. It does not ask for your password: if Applications is not writable for your user, it uses `~/Applications`. If WindFree is already installed, the old copy is replaced. With the app open, the script asks it to quit and waits a few seconds; if it does not quit, the script stops without changing anything and asks you to quit from the icon's menu.
+
+**Why does this avoid the warning?** macOS only shows the warning for files with the quarantine mark ("downloaded from the internet"), which browsers put on everything they download. `curl` does not put that mark, so an app installed this way opens normally. The app is still not notarized; it just skips the first-launch block.
+
+The script is [`install.sh`](install.sh), plain text you can read before running it. It only deletes its own temporary folders and the previous `WindFree.app`. For tests or mirrors it accepts three environment variables: `WINDFREE_DMG_URL` (download this DMG instead of the latest release's), `WINDFREE_INSTALL_DIR` (install into this folder instead of Applications) and `WINDFREE_NO_OPEN=1` (do not open the app at the end). Messages are in Portuguese when the Terminal language (`LANG`) is Portuguese, and in English otherwise.
+
+### Install from the DMG
 
 1. Open the DMG and drag **WindFree** to the **Applications** folder.
 2. Open WindFree from the Applications folder. The first time, macOS blocks it; see just below for how to allow it.
 3. The panel opens right away. The app gets an icon in the menu bar, near the clock, and another in the Dock. To keep it in the menu bar only, turn off **Show the icon in the Dock** in **Settings > Preferences**.
 
-The app does not update itself. To switch versions, quit the app, download the new DMG and replace the app in the Applications folder. You may have to allow it to open again.
+The app does not update itself. To switch versions, run the Terminal command above again. Or quit the app, download the new DMG and replace the app in the Applications folder; in that case you may have to allow it to open again.
 
 Coming from version 1.1.1? What changes:
 
@@ -68,6 +108,8 @@ Coming from version 1.1.1? What changes:
 - To switch air conditioners you no longer need to edit `device.json`: use **Settings > Device**. Your `device.json` still works.
 
 ### Allow the first launch
+
+This applies to the DMG downloaded with a browser. If you install [from Terminal](#install-from-terminal-no-warnings), you skip it.
 
 WindFree is not notarized (authenticated) by Apple. Notarization needs a paid developer account, which this project does not have, so the app ships with a local (ad-hoc) signature only. That is why macOS blocks the first launch.
 
@@ -211,6 +253,10 @@ The language is in **Settings > Preferences > Language**: Automatic, Português 
 
 The **Advanced features** (tropical night, cleaning and diagnostics) were barely tested in the original app and may not work on your unit.
 
+### New versions
+
+The app does not update itself, but it tells you: once a day it checks the project's releases page on GitHub. When a newer version is out, a dot appears on the settings button, a row with a **Download** button shows at the top of the settings, and the icon's menu gets an item. The button opens the release page; installing is still up to you. To stop the app from checking, turn off **Check for new versions** in Preferences.
+
 ### Open at login
 
 After the first launch the app starts by itself when you log in to the Mac, with the panel closed. To turn that off, uncheck **Open at login** in the icon's menu or in **Settings > Preferences**.
@@ -282,7 +328,7 @@ On a Mac, after `npm install`:
 npm run dist
 ```
 
-The `.dmg` files land in the `dist/` folder.
+The `WindFree-arm64.dmg` and `WindFree-x64.dmg` files land in the `dist/` folder.
 
 ## On Windows
 
@@ -379,11 +425,11 @@ The codes are `login` (not signed in), `rede` (no internet or SmartThings down),
 - The app re-reads the AC's state every 15 seconds while the panel is open and every minute while it is closed, to follow changes made elsewhere, such as with the remote control or the SmartThings app. Signed out, or after a response that took too long, it stops reading by itself until you try again.
 - On the Mac these scripts run on the Node that comes inside Electron, so the installed app does not need Node.js. On Windows the app uses the Node installed on the system.
 
-Everything runs on your computer. The sign-in is stored in the SmartThings CLI's config folder. Settings (preferences, favorites, timer and schedules) live in `settings.json` and energy use in `historico.json`, both in the app's data folder (on the Mac, `~/Library/Application Support/WindFree`). The app only talks to SmartThings' own servers, which are Samsung's.
+Everything runs on your computer. The sign-in is stored in the SmartThings CLI's config folder. Settings (preferences, favorites, timer and schedules) live in `settings.json` and energy use in `historico.json`, both in the app's data folder (on the Mac, `~/Library/Application Support/WindFree`). The app only talks to SmartThings' own servers, which are Samsung's, and once a day asks GitHub whether a new version is out (you can turn that off in **Preferences > Check for new versions**).
 
 ## Common problems
 
-- **macOS will not let you open the app**: it is the block on non-notarized apps. See [Allow the first launch](#allow-the-first-launch). If the warning says the app "is damaged", use the `xattr` command from that same section.
+- **macOS will not let you open the app**: it is the block on non-notarized apps. See [Allow the first launch](#allow-the-first-launch), or install [from Terminal](#install-from-terminal-no-warnings), which skips it. If the warning says the app "is damaged", use the `xattr` command from that same section.
 - **The icon does not show in the Mac menu bar**: with a full bar it may be hidden behind the notch. Hold ⌘ and drag icons to rearrange them, or close one you do not use. To reach the panel anyway, click the app's icon in the Dock or open WindFree again from the Applications folder.
 - **I do not want the icon in the Dock**: turn off **Show the icon in the Dock** in **Settings > Preferences**. The app then lives in the menu bar only.
 - **The panel did not open when I started the Mac**: that is on purpose. Opened by autostart, the app stays quiet; click the menu bar icon.
@@ -403,7 +449,7 @@ On the Mac:
 
 1. Turn off **Open at login** in the icon's menu or in **Settings > Preferences**.
 2. Click **Quit** in the icon's menu.
-3. Delete WindFree from the Applications folder. If you run from source, delete the project folder.
+3. Delete WindFree from the Applications folder (or from `~/Applications`, if the Terminal installer used that one). If you run from source, delete the project folder.
 4. If you want, also delete the `~/Library/Application Support/WindFree` folder, where the installed app's `device.json`, the settings and the energy history live, and the `~/Library/Application Support/@smartthings` folder, where the SmartThings CLI keeps the sign-in.
 
 Deleted the app before turning off autostart? Remove the leftover file:

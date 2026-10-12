@@ -1,7 +1,7 @@
 {
   "name": "samsung-windfree-menubar-app",
   "productName": "WindFree",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "private": true,
   "description": "Painel na barra de menus do Mac ou na bandeja do Windows para controlar ar-condicionado Samsung WindFree pelo SmartThings",
   "homepage": "https://github.com/kevinnfsilva/samsung-windfree-menubar-app#readme",
@@ -24,7 +24,7 @@
   },
   "build": {
     "appId": "io.github.kevinnfsilva.windfree",
-    "artifactName": "WindFree-${version}-${arch}.${ext}",
+    "artifactName": "WindFree-${arch}.${ext}",
     "asar": false,
     "npmRebuild": false,
     "publish": null,

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="64" viewBox="0 0 320 64" role="img" aria-label="Download for Apple Silicon (M1 or newer)">
+  <title>Download for Apple Silicon</title>
+  <rect x="0.5" y="0.5" width="319" height="63" rx="17" fill="#1d78ad" stroke="#17608c"/>
+  <rect x="1.5" y="1.5" width="317" height="61" rx="16" fill="none" stroke="#ffffff" stroke-opacity="0.14"/>
+  <g transform="translate(22 19)" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></g>
+  <text x="60" y="28" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="17" font-weight="700">Download for Apple Silicon</text>
+  <text x="60" y="47" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="13">M1 or newer</text>
+</svg>

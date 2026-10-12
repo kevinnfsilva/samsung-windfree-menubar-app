@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WindFree for Mac</title>
+<meta name="description" content="Control your Samsung WindFree air conditioner from the Mac menu bar. Download for Apple Silicon or Intel.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#eef1f4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101317" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://kevinnfsilva.github.io/samsung-windfree-menubar-app/">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="WindFree for Mac">
+<meta property="og:description" content="Control your Samsung WindFree air conditioner from the Mac menu bar.">
+<meta property="og:url" content="https://kevinnfsilva.github.io/samsung-windfree-menubar-app/">
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #e9edf2;
+  --glow: #f8fafc;
+  --card: #ffffff;
+  --card-soft: #f3f5f8;
+  --text: #161b21;
+  --muted: #4d5762;
+  --hairline: rgba(24, 36, 50, 0.11);
+  --accent: #1d78ad;
+  --accent-ink: #ffffff;
+  --accent-soft: rgba(29, 120, 173, 0.12);
+  --accent-text: #17608c;
+  --shadow: 0 1px 2px rgba(20, 30, 45, 0.06), 0 14px 34px rgba(20, 30, 45, 0.09);
+  --shadow-btn: 0 1px 2px rgba(15, 70, 105, 0.3), 0 12px 26px rgba(29, 120, 173, 0.28);
+  --code-bg: #101317;
+  --code-ink: #e3e9ef;
+  --code-muted: #8b939c;
+  --focus: #1d78ad;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1013;
+    --glow: #1c2128;
+    --card: #181c21;
+    --card-soft: #20252b;
+    --text: #eef1f4;
+    --muted: #a0a8b1;
+    --hairline: rgba(255, 255, 255, 0.09);
+    --accent: #a7d7f1;
+    --accent-ink: #0d1a26;
+    --accent-soft: rgba(167, 215, 241, 0.13);
+    --accent-text: #a7d7f1;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 16px 38px rgba(0, 0, 0, 0.42);
+    --shadow-btn: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 30px rgba(167, 215, 241, 0.16);
+    --code-bg: #0a0c0f;
+    --code-ink: #e3e9ef;
+    --code-muted: #7f8892;
+    --focus: #a7d7f1;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(1100px 560px at 50% -140px, var(--glow), transparent 72%), var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { line-height: 1.15; margin: 0; letter-spacing: -0.015em; }
+p { margin: 0; }
+a { color: var(--accent-text); text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+code, .mono { font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace; }
+img { display: block; max-width: 100%; height: auto; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 8px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.wrap { width: 100%; max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+@media (min-width: 700px) { .wrap { padding: 0 28px; } }
+
+/* Top bar: only the language switch */
+.top { display: flex; justify-content: flex-end; padding-top: 16px; padding-bottom: 4px; }
+.lang { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--hairline); border-radius: 999px; background: var(--card); box-shadow: var(--shadow); }
+.lang button {
+  appearance: none; border: 0; background: transparent; color: var(--muted); cursor: pointer;
+  font: inherit; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.02em;
+  min-width: 44px; min-height: 36px; padding: 0 14px; border-radius: 999px;
+}
+.lang button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.lang button:not([aria-pressed="true"]):hover { color: var(--text); }
+
+/* Hero */
+.hero { display: grid; gap: 36px; padding: 20px 0 8px; text-align: center; justify-items: center; }
+.hero-text { display: flex; flex-direction: column; align-items: center; width: 100%; }
+.app-icon { width: 112px; height: 112px; }
+.hero h1 { margin-top: 14px; font-size: clamp(2.5rem, 9vw, 3.75rem); font-weight: 750; }
+.pitch { margin-top: 12px; max-width: 30ch; font-size: clamp(1.15rem, 3.6vw, 1.4rem); line-height: 1.4; color: var(--muted); }
+
+.dl { display: grid; gap: 12px; width: 100%; max-width: 400px; margin-top: 28px; }
+.btn {
+  display: flex; align-items: center; gap: 14px; text-align: left; text-decoration: none;
+  padding: 12px 20px; min-height: 60px; border-radius: 18px;
+  background: var(--card); color: var(--text); border: 1px solid var(--hairline); box-shadow: var(--shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn:hover { transform: translateY(-1px); text-decoration: none; }
+.btn svg { flex: none; width: 24px; height: 24px; }
+.btn-text { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.btn-text strong { font-size: 1.0625rem; font-weight: 650; }
+.btn-text small { font-size: 0.875rem; color: var(--muted); }
+.dl[data-primary="arm64"] #dl-arm, .dl[data-primary="x64"] #dl-x64 {
+  min-height: 76px; padding: 14px 24px; background: var(--accent); color: var(--accent-ink); border-color: transparent; box-shadow: var(--shadow-btn); order: -1;
+}
+.dl[data-primary="arm64"] #dl-arm svg, .dl[data-primary="x64"] #dl-x64 svg { width: 28px; height: 28px; }
+.dl[data-primary="arm64"] #dl-arm .btn-text strong, .dl[data-primary="x64"] #dl-x64 .btn-text strong { font-size: 1.25rem; }
+.dl[data-primary="arm64"] #dl-arm .btn-text small, .dl[data-primary="x64"] #dl-x64 .btn-text small { color: inherit; opacity: 1; }
+
+.detect { min-height: 1.6em; margin-top: 12px; max-width: 46ch; font-size: 0.9375rem; color: var(--accent-text); font-weight: 500; }
+.hint { margin-top: 4px; max-width: 46ch; font-size: 0.9375rem; color: var(--muted); }
+.hint strong, .hint b { color: var(--text); font-weight: 600; }
+.meta { margin-top: 10px; font-size: 0.875rem; color: var(--muted); }
+
+.demo { margin: 0; width: 100%; max-width: 380px; }
+.demo img { width: 100%; border-radius: 26px; box-shadow: var(--shadow); background: var(--card-soft); }
+.demo figcaption { margin-top: 12px; font-size: 0.8125rem; color: var(--muted); }
+
+@media (min-width: 900px) {
+  .hero { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: 56px; text-align: left; justify-items: stretch; align-items: center; padding-top: 40px; }
+  .hero-text { align-items: flex-start; }
+  .pitch { max-width: 26ch; }
+  .demo { justify-self: end; max-width: 400px; }
+}
+
+/* Sections */
+section { margin-top: 64px; }
+@media (min-width: 700px) { section { margin-top: 88px; } }
+h2 { font-size: clamp(1.6rem, 5vw, 2.15rem); font-weight: 720; }
+.lead { margin-top: 10px; color: var(--muted); max-width: 62ch; }
+.card { background: var(--card); border: 1px solid var(--hairline); border-radius: 22px; padding: 22px; box-shadow: var(--shadow); }
+@media (min-width: 700px) { .card { padding: 28px; } }
+
+.steps { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 14px; }
+.steps li { display: flex; gap: 16px; align-items: flex-start; }
+.steps h3 { font-size: 1.15rem; font-weight: 680; margin-top: 4px; }
+.steps p { margin-top: 6px; color: var(--muted); font-size: 1rem; }
+.steps p strong { color: var(--text); font-weight: 620; }
+.steps code { white-space: nowrap; font-size: 0.9em; }
+.num {
+  flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent-text); font-weight: 750; font-size: 1.1rem;
+}
+@media (min-width: 900px) {
+  .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+  .steps li { flex-direction: column; }
+}
+.why { margin-top: 18px; padding: 16px 20px; border-radius: 18px; background: var(--card-soft); border: 1px solid var(--hairline); font-size: 0.98rem; color: var(--muted); }
+.why strong { color: var(--text); }
+
+.terminal h2 { font-size: clamp(1.4rem, 4.4vw, 1.8rem); }
+.terminal .lead strong { color: var(--text); font-weight: 620; }
+.code {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 18px;
+  padding: 14px 14px 14px 18px; border-radius: 16px; background: var(--code-bg); color: var(--code-ink);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+.code code { flex: 1 1 280px; min-width: 0; font-size: 0.9375rem; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
+.code code::before { content: "$ "; color: var(--code-muted); user-select: none; -webkit-user-select: none; }
+.copy {
+  appearance: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+  min-height: 44px; padding: 0 18px; border-radius: 12px; border: 0; font: inherit; font-size: 0.9375rem; font-weight: 650;
+  background: var(--accent); color: var(--accent-ink);
+}
+.copy svg { width: 18px; height: 18px; flex: none; }
+.copy:hover { filter: brightness(1.05); }
+.copy[data-state="done"] { background: #3fa37f; color: #06251a; }
+@media (max-width: 520px) { .copy { width: 100%; } }
+.terminal .note { margin-top: 14px; font-size: 0.95rem; color: var(--muted); }
+.terminal .note + .note { margin-top: 8px; }
+
+.feat-grid { display: grid; gap: 28px; margin-top: 28px; }
+.ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.ticks li { position: relative; padding-left: 32px; }
+.ticks li::before {
+  content: ""; position: absolute; left: 0; top: 0.2em; width: 20px; height: 20px; border-radius: 50%; background: var(--accent-soft);
+}
+.ticks li::after {
+  content: ""; position: absolute; left: 6px; top: calc(0.2em + 5px); width: 8px; height: 5px;
+  border-left: 2px solid var(--accent-text); border-bottom: 2px solid var(--accent-text); transform: rotate(-45deg);
+}
+.feat-note { margin-top: 16px; font-size: 0.95rem; color: var(--muted); }
+.shot { margin: 0; }
+.shot img { width: 100%; border-radius: 22px; box-shadow: var(--shadow); background: var(--card-soft); }
+.shot.wide { margin-top: 28px; }
+.shot.tall { max-width: 340px; width: 100%; justify-self: center; }
+@media (min-width: 900px) {
+  .feat-grid { grid-template-columns: minmax(0, 1fr) 340px; gap: 48px; align-items: center; }
+}
+
+.need { display: grid; gap: 14px; margin-top: 22px; }
+.need ul { margin: 0; padding-left: 1.2em; }
+.need li + li { margin-top: 6px; }
+.windows { margin-top: 18px; color: var(--muted); }
+.windows strong { color: var(--text); }
+
+.links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.pill {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 20px; border-radius: 999px;
+  background: var(--card); border: 1px solid var(--hairline); box-shadow: var(--shadow); color: var(--text); font-weight: 620; text-decoration: none;
+}
+.pill:hover { border-color: var(--accent); }
+.pill svg { width: 16px; height: 16px; flex: none; }
+
+footer.wrap { margin-top: 56px; padding-bottom: 56px; color: var(--muted); font-size: 0.9375rem; }
+footer p + p { margin-top: 8px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+<noscript><style>.lang, .copy, img[data-src-en] { display: none; }</style></noscript>
+</head>
+<body>
+
+<header class="top wrap">
+  <div class="lang" role="group" aria-label="Language / Idioma">
+    <button type="button" id="lang-pt" data-lang="pt" aria-pressed="false" lang="pt-BR" aria-label="Português">PT</button>
+    <button type="button" id="lang-en" data-lang="en" aria-pressed="true" lang="en" aria-label="English">EN</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero" style="margin-top: 0">
+    <div class="hero-text">
+      <img class="app-icon" src="icon.png" width="112" height="112" alt="">
+      <h1>WindFree</h1>
+      <p class="pitch" data-i18n="pitch">Control your Samsung WindFree air conditioner from the Mac menu bar.</p>
+
+      <div class="dl" id="dl" data-primary="arm64">
+        <a class="btn" id="dl-arm" href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest/download/WindFree-arm64.dmg">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></svg>
+          <span class="btn-text"><strong data-i18n="dl_arm">Download for Apple Silicon</strong><small data-i18n="dl_arm_sub">M1 or newer</small></span>
+        </a>
+        <a class="btn" id="dl-x64" href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest/download/WindFree-x64.dmg">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></svg>
+          <span class="btn-text"><strong data-i18n="dl_x64">Download for Intel</strong><small data-i18n="dl_x64_sub">Macs with an Intel processor</small></span>
+        </a>
+      </div>
+      <p class="detect" id="detect" role="status"></p>
+      <p class="hint" data-i18n="which_mac">Not sure which Mac you have? Open the Apple menu &gt; <b>About&nbsp;This&nbsp;Mac</b>. If it says “Chip”, choose Apple Silicon. If it says “Processor”, choose Intel.</p>
+      <p class="meta" data-i18n="meta">Free · macOS 13 or newer</p>
+    </div>
+
+    <figure class="demo">
+      <img id="demo" data-src-en="demo.en.gif" data-src-pt="demo.pt-BR.gif" width="420" height="554" alt="Demo: the AC is switched on, the temperature goes up, WindFree is turned on, the favorites list opens and then the settings" data-i18n-alt="demo_alt">
+      <noscript><img src="demo.en.gif" width="420" height="554" alt="Demo of the WindFree panel"></noscript>
+      <figcaption data-i18n="demo_cap">Screens from the real app, with a simulated air conditioner.</figcaption>
+    </figure>
+  </section>
+
+  <section id="install" aria-labelledby="install-title">
+    <h2 id="install-title" data-i18n="install_h">Install in three steps</h2>
+    <ol class="steps">
+      <li class="card">
+        <span class="num" aria-hidden="true">1</span>
+        <div>
+          <h3 data-i18n="s1_h">Open the DMG</h3>
+          <p data-i18n="s1_p">Double-click the file you downloaded (<code>WindFree-arm64.dmg</code> or <code>WindFree-x64.dmg</code>) in your Downloads folder.</p>
+        </div>
+      </li>
+      <li class="card">
+        <span class="num" aria-hidden="true">2</span>
+        <div>
+          <h3 data-i18n="s2_h">Drag it to Applications</h3>
+          <p data-i18n="s2_p">In the window that opens, drag <strong>WindFree</strong> onto the <strong>Applications</strong> folder. Then open it from there.</p>
+        </div>
+      </li>
+      <li class="card">
+        <span class="num" aria-hidden="true">3</span>
+        <div>
+          <h3 data-i18n="s3_h">Allow the first open</h3>
+          <p data-i18n="s3_p">The first time, macOS blocks WindFree. Dismiss the warning (do not move the app to the Trash), open <strong>System Settings &gt; Privacy &amp; Security</strong>, scroll to <strong>Security</strong> and click <strong>Open Anyway</strong> next to WindFree. Confirm with your password or Touch ID.</p>
+        </div>
+      </li>
+    </ol>
+    <p class="why" data-i18n="why"><strong>Why the warning?</strong> WindFree is not notarized by Apple. Notarization needs a paid developer account, which this project does not have, so the app only carries a local signature and macOS cannot vouch for it. It is the same app whose code is public on GitHub.</p>
+  </section>
+
+  <section id="terminal" class="terminal card" aria-labelledby="terminal-title">
+    <h2 id="terminal-title" data-i18n="term_h">Prefer no warnings? Use one line in Terminal</h2>
+    <p class="lead" data-i18n="term_p">Open <strong>Terminal</strong> (in Applications &gt; Utilities), paste this line and press Return. It downloads the right version for your Mac, checks it, puts WindFree in Applications and opens it. Nothing asks for your password.</p>
+    <div class="code">
+      <code id="cmd">curl -fsSL https://raw.githubusercontent.com/kevinnfsilva/samsung-windfree-menubar-app/main/install.sh | bash</code>
+      <button type="button" class="copy" id="copy" data-i18n-aria="copy_aria" aria-label="Copy the install command">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg>
+        <span id="copy-label" data-i18n="copy">Copy</span>
+      </button>
+    </div>
+    <span class="sr" id="copy-status" role="status" aria-live="polite"></span>
+    <p class="note" data-i18n="term_why">Files downloaded this way do not get the “downloaded from the internet” mark that makes macOS show the warning, so the app opens straight away.</p>
+    <p class="note" data-i18n="term_read">The script is short and readable: <a href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app/blob/main/install.sh">read install.sh on GitHub</a> before you run it.</p>
+  </section>
+
+  <section id="features" aria-labelledby="features-title">
+    <h2 id="features-title" data-i18n="feat_h">What it does</h2>
+    <figure class="shot wide">
+      <img data-src-en="hero.en.webp" data-src-pt="hero.pt-BR.webp" width="2440" height="1104" loading="lazy" decoding="async" alt="The WindFree panel in three states: on in cool mode, with WindFree on, and off" data-i18n-alt="hero_alt">
+      <noscript><img src="hero.en.webp" width="2440" height="1104" alt="The WindFree panel in three states"></noscript>
+    </figure>
+    <div class="feat-grid">
+      <div>
+        <ul class="ticks">
+          <li data-i18n="f1">Turn the AC on and off and set the temperature from the menu bar icon or the panel.</li>
+          <li data-i18n="f2">Change the mode, fan speed and vane direction. Turn on WindFree and sleep mode.</li>
+          <li data-i18n="f3">See the room temperature and humidity that the AC measures.</li>
+          <li data-i18n="f4">Save favorites: your usual settings, one click away.</li>
+          <li data-i18n="f5">Set a timer, or schedules by time and weekday.</li>
+          <li data-i18n="f6">Follow the energy use and get notified about the filter, an offline AC or an AC left on.</li>
+          <li data-i18n="f7">Light or dark appearance, in Portuguese or English.</li>
+          <li data-i18n="f8">Starts with your Mac, if you want it to.</li>
+        </ul>
+        <p class="feat-note" data-i18n="f_note">The panel only shows the options your own unit supports.</p>
+      </div>
+      <figure class="shot tall">
+        <img data-src-en="themes.en.webp" data-src-pt="themes.pt-BR.webp" width="1648" height="2144" loading="lazy" decoding="async" alt="The main panel and the settings, side by side in dark and light mode" data-i18n-alt="themes_alt">
+        <noscript><img src="themes.en.webp" width="1648" height="2144" alt="The main panel and the settings in dark and light mode"></noscript>
+      </figure>
+    </div>
+    <figure class="shot wide">
+      <img data-src-en="routines.en.webp" data-src-pt="routines.pt-BR.webp" width="2440" height="1104" loading="lazy" decoding="async" alt="The favorites list, the timer menu with an active timer and the schedules screen" data-i18n-alt="routines_alt">
+      <noscript><img src="routines.en.webp" width="2440" height="1104" alt="The favorites list, the timer menu and the schedules screen"></noscript>
+    </figure>
+  </section>
+
+  <section id="requirements" class="card" aria-labelledby="req-title">
+    <h2 id="req-title" data-i18n="req_h">What you need</h2>
+    <div class="need">
+      <ul>
+        <li data-i18n="r1">A Mac with macOS 13 (Ventura) or newer, Apple Silicon or Intel.</li>
+        <li data-i18n="r2">A Samsung account with your air conditioner already set up in the SmartThings app.</li>
+        <li data-i18n="r3">Nothing else: you do not need to install Node.js.</li>
+      </ul>
+    </div>
+    <p class="windows" data-i18n="win">On Windows? <strong>There is no installer.</strong> The app runs from the source code with Node.js, and <a href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app/blob/main/README.en.md#on-windows" id="win-link">the README</a> explains how.</p>
+  </section>
+
+  <section id="links" aria-label="Links">
+    <div class="links">
+      <a class="pill" href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app">
+        <span data-i18n="gh">GitHub repository</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+      </a>
+      <a class="pill" href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest">
+        <span data-i18n="rel">Latest release notes</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <p data-i18n="credits">Based on the Windows tray app by <a href="https://github.com/c0dag">@c0dag</a> (<a href="https://github.com/c0dag/samsung-windfree-tray-app">github.com/c0dag/samsung-windfree-tray-app</a>).</p>
+  <p data-i18n="disclaimer">WindFree is an independent project and is not affiliated with Samsung.</p>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var PT = {
+    page_title: 'WindFree para Mac',
+    page_desc: 'Controle o ar-condicionado Samsung WindFree pela barra de menus do Mac. Baixe para Apple Silicon ou Intel.',
+    pitch: 'Controle o ar-condicionado Samsung WindFree pela barra de menus do Mac.',
+    dl_arm: 'Baixar para Apple Silicon',
+    dl_arm_sub: 'M1 ou mais novo',
+    dl_x64: 'Baixar para Intel',
+    dl_x64_sub: 'Macs com processador Intel',
+    which_mac: 'Não sabe qual Mac você tem? Abra o menu Apple &gt; <b>Sobre&nbsp;Este&nbsp;Mac</b>. Se aparecer “Chip”, escolha Apple Silicon. Se aparecer “Processador”, escolha Intel.',
+    meta: 'Grátis · macOS 13 ou mais novo',
+    demo_alt: 'Demonstração: o ar é ligado, a temperatura sobe, o WindFree é ativado, a lista de favoritos abre e depois os ajustes',
+    demo_cap: 'Telas do app de verdade, com um ar-condicionado simulado.',
+    install_h: 'Instale em três passos',
+    s1_h: 'Abra o DMG',
+    s1_p: 'Dê dois cliques no arquivo que você baixou (<code>WindFree-arm64.dmg</code> ou <code>WindFree-x64.dmg</code>), na pasta Downloads.',
+    s2_h: 'Arraste para Aplicativos',
+    s2_p: 'Na janela que abrir, arraste o <strong>WindFree</strong> para a pasta <strong>Aplicativos</strong>. Depois abra o app por lá.',
+    s3_h: 'Libere a primeira abertura',
+    s3_p: 'Na primeira vez, o macOS bloqueia o WindFree. Feche o aviso (sem mover o app para o Lixo), abra <strong>Ajustes do Sistema &gt; Privacidade e Segurança</strong>, role até <strong>Segurança</strong> e clique em <strong>Abrir Mesmo Assim</strong> ao lado do WindFree. Confirme com a senha ou o Touch ID.',
+    why: '<strong>Por que esse aviso?</strong> O WindFree não é notarizado pela Apple. A notarização exige uma conta paga de desenvolvedor, que este projeto não tem; por isso o app só leva uma assinatura local e o macOS não consegue atestá-lo. É o mesmo app, com o código aberto no GitHub.',
+    term_h: 'Prefere sem avisos? Use uma linha no Terminal',
+    term_p: 'Abra o <strong>Terminal</strong> (em Aplicativos &gt; Utilitários), cole esta linha e aperte Return. Ela baixa a versão certa para o seu Mac, confere o arquivo, coloca o WindFree em Aplicativos e abre o app. Nada pede a sua senha.',
+    copy: 'Copiar',
+    copied: 'Copiado',
+    copy_failed: 'Selecione e copie',
+    copy_aria: 'Copiar o comando de instalação',
+    copy_done_status: 'Comando copiado',
+    term_why: 'Arquivos baixados assim não recebem a marca de “baixado da internet” que faz o macOS mostrar o aviso, então o app abre direto.',
+    term_read: 'O script é curto e fácil de ler: <a href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app/blob/main/install.sh">leia o install.sh no GitHub</a> antes de rodar.',
+    feat_h: 'O que ele faz',
+    hero_alt: 'O painel do WindFree em três estados: ligado no frio, com o WindFree ligado e desligado',
+    f1: 'Liga e desliga o ar e muda a temperatura pelo ícone na barra de menus ou pelo painel.',
+    f2: 'Troca o modo, a velocidade do vento e a direção da aleta. Liga o WindFree e o modo sono.',
+    f3: 'Mostra a temperatura e a umidade do ambiente, medidas pelo próprio ar.',
+    f4: 'Guarda favoritos: seus ajustes de sempre, a um clique.',
+    f5: 'Programa um timer, ou agendamentos por horário e dia da semana.',
+    f6: 'Acompanha o consumo e avisa sobre o filtro, o ar offline ou o ar ligado há muito tempo.',
+    f7: 'Aparência clara ou escura, em português ou inglês.',
+    f8: 'Abre junto com o Mac, se você quiser.',
+    f_note: 'O painel só mostra as opções que o seu aparelho oferece.',
+    themes_alt: 'O painel principal e os ajustes, lado a lado em modo escuro e em modo claro',
+    routines_alt: 'A lista de favoritos, o menu do timer com um timer ativo e a tela de agendamentos',
+    req_h: 'O que você precisa',
+    r1: 'Um Mac com macOS 13 (Ventura) ou mais novo, Apple Silicon ou Intel.',
+    r2: 'Uma conta Samsung com o ar-condicionado já configurado no app SmartThings.',
+    r3: 'Mais nada: não precisa instalar o Node.js.',
+    win: 'No Windows? <strong>Não há instalador.</strong> O app roda direto do código-fonte, com o Node.js, e <a href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app/blob/main/README.md#no-windows" id="win-link">o README</a> explica como.',
+    gh: 'Repositório no GitHub',
+    rel: 'Notas da última versão',
+    credits: 'Baseado no app de bandeja para Windows do <a href="https://github.com/c0dag">@c0dag</a> (<a href="https://github.com/c0dag/samsung-windfree-tray-app">github.com/c0dag/samsung-windfree-tray-app</a>).',
+    disclaimer: 'O WindFree é um projeto independente, sem vínculo com a Samsung.',
+    detect_arm64: 'Seu Mac parece ser Apple Silicon, então esse download vem primeiro.',
+    detect_x64: 'Seu Mac parece ser Intel, então esse download vem primeiro.',
+    detect_other: 'Estes downloads são para Mac. No Windows, veja a nota mais abaixo.'
+  };
+  var EN_EXTRA = {
+    page_title: 'WindFree for Mac',
+    page_desc: 'Control your Samsung WindFree air conditioner from the Mac menu bar. Download for Apple Silicon or Intel.',
+    copy: 'Copy',
+    copied: 'Copied',
+    copy_failed: 'Select and copy',
+    copy_aria: 'Copy the install command',
+    copy_done_status: 'Command copied',
+    detect_arm64: 'Your Mac looks like an Apple Silicon Mac, so that download comes first.',
+    detect_x64: 'Your Mac looks like an Intel Mac, so that download comes first.',
+    detect_other: 'These downloads are for Macs. On Windows, see the note below.'
+  };
+
+  var root = document.documentElement;
+  var lang = 'en';
+  var archGuess = null;      // 'arm64', 'x64', 'other' or null when the browser does not say
+  var copyTimer = null;
+  var originals = [];        // [element, kind, key, English text] captured from the page itself
+
+  function collect() {
+    var nodes = document.querySelectorAll('[data-i18n],[data-i18n-alt],[data-i18n-aria]');
+    for (var i = 0; i < nodes.length; i += 1) {
+      var el = nodes[i];
+      if (el.hasAttribute('data-i18n')) originals.push([el, 'html', el.getAttribute('data-i18n'), el.innerHTML]);
+      if (el.hasAttribute('data-i18n-alt')) originals.push([el, 'alt', el.getAttribute('data-i18n-alt'), el.getAttribute('alt')]);
+      if (el.hasAttribute('data-i18n-aria')) originals.push([el, 'aria-label', el.getAttribute('data-i18n-aria'), el.getAttribute('aria-label')]);
+    }
+  }
+
+  function text(key) {
+    var table = lang === 'pt' ? PT : EN_EXTRA;
+    return table[key] !== undefined ? table[key] : EN_EXTRA[key];
+  }
+
+  function pickLanguage() {
+    try {
+      var asked = new URLSearchParams(window.location.search).get('lang');
+      if (asked === 'pt' || asked === 'en') return asked;
+    } catch (e) { /* old browser: carry on */ }
+    try {
+      var saved = window.localStorage.getItem('windfree-lang');
+      if (saved === 'pt' || saved === 'en') return saved;
+    } catch (e) { /* storage blocked: carry on */ }
+    var list = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en'];
+    for (var i = 0; i < list.length; i += 1) {
+      var code = String(list[i]).toLowerCase();
+      if (code.indexOf('pt') === 0) return 'pt';
+      if (code.indexOf('en') === 0) return 'en';
+    }
+    return 'en';
+  }
+
+  function renderDetect() {
+    var el = document.getElementById('detect');
+    var key = archGuess === 'arm64' || archGuess === 'x64' || archGuess === 'other' ? 'detect_' + archGuess : null;
+    el.textContent = key ? text(key) : '';
+  }
+
+  function setLanguage(next, remember) {
+    lang = next === 'pt' ? 'pt' : 'en';
+    root.setAttribute('lang', lang === 'pt' ? 'pt-BR' : 'en');
+    for (var i = 0; i < originals.length; i += 1) {
+      var item = originals[i];
+      var value = lang === 'pt' && PT[item[2]] !== undefined ? PT[item[2]] : item[3];
+      if (item[1] === 'html') item[0].innerHTML = value;
+      else item[0].setAttribute(item[1], value);
+    }
+    var images = document.querySelectorAll('img[data-src-en]');
+    for (var j = 0; j < images.length; j += 1) {
+      var wanted = images[j].getAttribute(lang === 'pt' ? 'data-src-pt' : 'data-src-en');
+      if (images[j].getAttribute('src') !== wanted) images[j].setAttribute('src', wanted);
+    }
+    var link = document.getElementById('win-link');
+    if (link) link.setAttribute('href', 'https://github.com/kevinnfsilva/samsung-windfree-menubar-app/blob/main/' + (lang === 'pt' ? 'README.md#no-windows' : 'README.en.md#on-windows'));
+    document.title = text('page_title');
+    var desc = document.querySelector('meta[name="description"]');
+    if (desc) desc.setAttribute('content', text('page_desc'));
+    var buttons = document.querySelectorAll('.lang button');
+    for (var k = 0; k < buttons.length; k += 1) {
+      buttons[k].setAttribute('aria-pressed', buttons[k].getAttribute('data-lang') === lang ? 'true' : 'false');
+    }
+    resetCopyButton();
+    renderDetect();
+    if (remember) {
+      try { window.localStorage.setItem('windfree-lang', lang); } catch (e) { /* not essential */ }
+    }
+  }
+
+  // The browser never says "Apple Silicon" in the user agent: every Mac claims to be Intel. Chromium has a real answer
+  // (User-Agent Client Hints), and the graphics chip name helps elsewhere. Everything is read here and sent nowhere.
+  function isMac() {
+    var ua = navigator.userAgent || '';
+    var touch = navigator.maxTouchPoints > 1;
+    return /Macintosh|Mac OS X/.test(ua) && !/iPhone|iPad|iPod/.test(ua) && !touch;
+  }
+
+  function archFromGraphics() {
+    try {
+      var canvas = document.createElement('canvas');
+      var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      if (!gl) return null;
+      var info = gl.getExtension('WEBGL_debug_renderer_info');
+      var name = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
+      if (/Apple M\d/i.test(name)) return 'arm64';
+      if (/Intel|AMD|Radeon|NVIDIA|GeForce/i.test(name)) return 'x64';
+    } catch (e) { /* no WebGL: no answer */ }
+    return null;
+  }
+
+  function guessArch() {
+    if (!isMac()) return Promise.resolve('other');
+    var data = navigator.userAgentData;
+    if (data && typeof data.getHighEntropyValues === 'function') {
+      return data.getHighEntropyValues(['architecture']).then(function (values) {
+        if (values && values.architecture === 'arm') return 'arm64';
+        if (values && values.architecture === 'x86') return 'x64';
+        return archFromGraphics();
+      }, function () { return archFromGraphics(); });
+    }
+    return Promise.resolve(archFromGraphics());
+  }
+
+  function applyArch(guess) {
+    archGuess = guess;
+    // Without a clear answer Apple Silicon stays first: it is the likelier Mac today.
+    document.getElementById('dl').setAttribute('data-primary', guess === 'x64' ? 'x64' : 'arm64');
+    renderDetect();
+  }
+
+  function resetCopyButton() {
+    var button = document.getElementById('copy');
+    if (copyTimer) { window.clearTimeout(copyTimer); copyTimer = null; }
+    button.removeAttribute('data-state');
+    document.getElementById('copy-label').textContent = text('copy');
+    document.getElementById('copy-status').textContent = '';
+  }
+
+  function copyCommand() {
+    var command = document.getElementById('cmd').textContent.trim();
+    var label = document.getElementById('copy-label');
+    var button = document.getElementById('copy');
+
+    function finish(ok) {
+      if (copyTimer) window.clearTimeout(copyTimer);
+      if (ok) button.setAttribute('data-state', 'done');
+      label.textContent = ok ? text('copied') : text('copy_failed');
+      document.getElementById('copy-status').textContent = ok ? text('copy_done_status') : '';
+      if (!ok) selectCommand();
+      copyTimer = window.setTimeout(resetCopyButton, 2500);
+    }
+
+    function selectCommand() {
+      try {
+        var range = document.createRange();
+        range.selectNodeContents(document.getElementById('cmd'));
+        var selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      } catch (e) { /* nothing to select */ }
+    }
+
+    function viaSelection() {
+      var ok = false;
+      var area = document.createElement('textarea');
+      area.value = command;
+      area.setAttribute('readonly', '');
+      area.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+      document.body.appendChild(area);
+      area.select();
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      document.body.removeChild(area);
+      finish(ok);
+    }
+
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      navigator.clipboard.writeText(command).then(function () { finish(true); }, viaSelection);
+    } else {
+      viaSelection();
+    }
+  }
+
+  function init() {
+    collect();
+    var buttons = document.querySelectorAll('.lang button');
+    for (var i = 0; i < buttons.length; i += 1) {
+      buttons[i].addEventListener('click', function (event) {
+        setLanguage(event.currentTarget.getAttribute('data-lang'), true);
+      });
+    }
+    document.getElementById('copy').addEventListener('click', copyCommand);
+    setLanguage(pickLanguage(), false);
+    guessArch().then(applyArch, function () { applyArch(null); });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

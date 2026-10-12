@@ -4,6 +4,30 @@
   <img src="build/icon.png" width="128" height="128" alt="Ícone do WindFree" />
   <h1>WindFree</h1>
   <p>Controle o ar-condicionado Samsung WindFree pela barra de menus do Mac ou pela bandeja do Windows.</p>
+</div>
+
+<p align="center">
+  <a href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest/download/WindFree-arm64.dmg"><img src="docs/btn-download-arm64.pt-BR.svg" width="300" alt="Baixar para Apple Silicon (M1 ou mais novo)" /></a>
+  &nbsp;
+  <a href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest/download/WindFree-x64.dmg"><img src="docs/btn-download-x64.pt-BR.svg" width="300" alt="Baixar para Intel" /></a>
+</p>
+
+<p align="center">
+  <sub>Não sabe qual é o seu Mac? Menu Apple &gt; <b>Sobre Este Mac</b>: com "Chip" é Apple Silicon, com "Processador" é Intel. Precisa do macOS 13 ou mais novo. Para Windows, veja <a href="#no-windows">No Windows</a>.</sub>
+</p>
+
+<p align="center">
+  <a href="https://kevinnfsilva.github.io/samsung-windfree-menubar-app/">Página de download</a> ·
+  <a href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest">Notas da versão</a>
+</p>
+
+<p align="center">Prefere instalar sem o aviso do macOS? Cole esta linha no Terminal:</p>
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/kevinnfsilva/samsung-windfree-menubar-app/main/install.sh | bash
+```
+
+<div align="center">
   <p>
     <a href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest"><img src="https://img.shields.io/github/v/release/kevinnfsilva/samsung-windfree-menubar-app?label=vers%C3%A3o" alt="Última versão" /></a>
     <img src="https://img.shields.io/badge/macOS-13%2B-111111?logo=apple&logoColor=white" alt="macOS 13 ou mais novo" />
@@ -44,22 +68,38 @@ Você precisa de:
 
 Não precisa instalar o Node.js: o app instalado já traz tudo o que usa.
 
-Baixe o instalador na página da [última versão](https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest):
+Escolha o arquivo do seu Mac. Os links sempre apontam para a última versão:
 
 | Seu Mac | Arquivo |
 |---|---|
-| Apple Silicon (M1 ou mais novo) | o que termina em `-arm64.dmg` |
-| Intel | o que termina em `-x64.dmg` |
+| Apple Silicon (M1 ou mais novo) | [`WindFree-arm64.dmg`](https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest/download/WindFree-arm64.dmg) |
+| Intel | [`WindFree-x64.dmg`](https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest/download/WindFree-x64.dmg) |
 
 Na dúvida, abra o menu Apple e escolha **Sobre Este Mac**. Se aparecer "Chip", é Apple Silicon. Se aparecer "Processador", é Intel.
 
-### Instalar
+As mesmas opções, com explicações, estão na [página de download](https://kevinnfsilva.github.io/samsung-windfree-menubar-app/). Há dois jeitos de instalar: pelo Terminal, sem o aviso do macOS, ou abrindo o DMG.
+
+### Instalar pelo Terminal (sem avisos)
+
+Cole esta linha no Terminal (em Aplicativos > Utilitários) e aperte Return:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/kevinnfsilva/samsung-windfree-menubar-app/main/install.sh | bash
+```
+
+O script baixa o DMG certo para o seu Mac (Apple Silicon ou Intel), confere se ele contém o WindFree, copia o app para a pasta **Aplicativos** e abre. Não pede senha: se a pasta Aplicativos não aceitar gravação para o seu usuário, ele usa `~/Applications`. Se o WindFree já estiver instalado, a cópia antiga é trocada. Com o app aberto, o script pede para ele sair e espera alguns segundos; se ele não sair, o script para sem mexer em nada e pede para você sair pelo menu do ícone.
+
+**Por que isso evita o aviso?** O aviso do macOS vale só para arquivos com a marca de quarentena ("baixado da internet"), que os navegadores põem em tudo o que baixam. O `curl` não põe essa marca, então o app instalado assim abre normalmente. O app continua não notarizado; ele só não passa pelo bloqueio da primeira abertura.
+
+O script é o [`install.sh`](install.sh), um texto simples que dá para ler antes de rodar. Ele só apaga as suas próprias pastas temporárias e a cópia anterior do `WindFree.app`. Para testes ou espelhos, aceita três variáveis de ambiente: `WINDFREE_DMG_URL` (baixa esse DMG, em vez do da última versão), `WINDFREE_INSTALL_DIR` (instala nessa pasta, em vez de Aplicativos) e `WINDFREE_NO_OPEN=1` (não abre o app no fim). As mensagens saem em português quando o idioma do Terminal (`LANG`) é português, e em inglês nos outros casos.
+
+### Instalar pelo DMG
 
 1. Abra o DMG e arraste o **WindFree** para a pasta **Aplicativos**.
 2. Abra o WindFree pela pasta Aplicativos. Na primeira vez o macOS bloqueia; veja logo abaixo como liberar.
 3. O painel abre na hora. O app fica com um ícone na barra de menus, perto do relógio, e outro no Dock. Para ficar só na barra de menus, desligue **Mostrar o ícone no Dock** em **Ajustes > Preferências**.
 
-O app não se atualiza sozinho. Para trocar de versão, saia do app, baixe o DMG novo e substitua o app na pasta Aplicativos. Talvez seja preciso liberar a abertura de novo.
+O app não se atualiza sozinho. Para trocar de versão, rode de novo o comando do Terminal acima. Ou saia do app, baixe o DMG novo e substitua o app na pasta Aplicativos; neste caso talvez seja preciso liberar a abertura de novo.
 
 Vindo da versão 1.1.1? O que muda:
 
@@ -68,6 +108,8 @@ Vindo da versão 1.1.1? O que muda:
 - Para trocar de ar-condicionado não precisa mais editar o `device.json`: use **Ajustes > Aparelho**. O seu `device.json` continua valendo.
 
 ### Liberar a primeira abertura
+
+Isto vale para o DMG baixado pelo navegador. Quem instala [pelo Terminal](#instalar-pelo-terminal-sem-avisos) não passa por aqui.
 
 O WindFree não é notarizado (autenticado) pela Apple. A notarização exige uma conta paga de desenvolvedor, que este projeto não tem, então o app sai só com uma assinatura local (ad-hoc). Por isso o macOS bloqueia a primeira abertura.
 
@@ -211,6 +253,10 @@ Em **Ajustes** ficam a luz do display, o bipe, a secagem automática, o modo ext
 
 As **Funções avançadas** (noite tropical, limpeza e diagnóstico) foram pouco testadas no app original e podem não funcionar no seu aparelho.
 
+### Versões novas
+
+O app não se atualiza sozinho, mas avisa: uma vez por dia ele consulta a página de versões do projeto no GitHub. Quando sai uma versão mais nova, aparece um ponto no botão de ajustes, uma linha no topo dos ajustes com o botão **Baixar** e um item no menu do ícone. O botão abre a página da versão; instalar continua com você. Para o app não fazer essa consulta, desligue **Procurar versões novas** nas Preferências.
+
 ### Abrir com o macOS
 
 Depois da primeira abertura o app passa a abrir sozinho quando você inicia a sessão no Mac, com o painel fechado. Para desligar, desmarque **Abrir com o macOS** no menu do ícone ou em **Ajustes > Preferências**.
@@ -282,7 +328,7 @@ Num Mac, depois do `npm install`:
 npm run dist
 ```
 
-Os arquivos `.dmg` saem na pasta `dist/`.
+Os arquivos `WindFree-arm64.dmg` e `WindFree-x64.dmg` saem na pasta `dist/`.
 
 ## No Windows
 
@@ -377,11 +423,11 @@ Os códigos são `login` (falta entrar na conta), `rede` (sem internet ou SmartT
 - O app relê o estado do ar a cada 15 segundos com o painel aberto e a cada minuto com ele fechado, para acompanhar o que muda por fora, como pelo controle remoto ou pelo app SmartThings. Sem login, ou depois de uma resposta lenta demais, ele para de ler sozinho até você tentar de novo.
 - No Mac esses scripts rodam no Node que já vem dentro do Electron, por isso o app instalado não precisa do Node.js. No Windows o app usa o Node instalado no sistema.
 
-Tudo roda no seu computador. O login fica guardado na pasta de configuração do SmartThings CLI. As configurações (preferências, favoritos, timer e agendamentos) ficam em `settings.json` e o consumo em `historico.json`, os dois na pasta de dados do app (no Mac, `~/Library/Application Support/WindFree`). O app só fala com os servidores do SmartThings, da Samsung.
+Tudo roda no seu computador. O login fica guardado na pasta de configuração do SmartThings CLI. As configurações (preferências, favoritos, timer e agendamentos) ficam em `settings.json` e o consumo em `historico.json`, os dois na pasta de dados do app (no Mac, `~/Library/Application Support/WindFree`). O app só fala com os servidores do SmartThings, da Samsung, e uma vez por dia pergunta ao GitHub se saiu uma versão nova (dá para desligar em **Preferências > Procurar versões novas**).
 
 ## Problemas comuns
 
-- **O macOS não deixa abrir o app**: é o bloqueio de apps não notarizados. Veja [Liberar a primeira abertura](#liberar-a-primeira-abertura). Se o aviso disser que o app "está danificado", use o comando `xattr` dessa mesma seção.
+- **O macOS não deixa abrir o app**: é o bloqueio de apps não notarizados. Veja [Liberar a primeira abertura](#liberar-a-primeira-abertura), ou instale [pelo Terminal](#instalar-pelo-terminal-sem-avisos), que não passa por ele. Se o aviso disser que o app "está danificado", use o comando `xattr` dessa mesma seção.
 - **O ícone não aparece na barra de menus do Mac**: com a barra cheia ele pode estar escondido atrás do notch. Segure ⌘ e arraste os ícones para reorganizar, ou feche algum que não usa. Para chegar ao painel mesmo assim, clique no ícone do app no Dock ou abra o WindFree de novo pela pasta Aplicativos.
 - **Não quero o ícone no Dock**: desligue **Mostrar o ícone no Dock** em **Ajustes > Preferências**. O app fica só na barra de menus.
 - **O painel não abriu quando liguei o Mac**: é de propósito. Aberto pelo início automático, o app fica quieto; clique no ícone da barra de menus.
@@ -401,7 +447,7 @@ No Mac:
 
 1. Desligue **Abrir com o macOS** no menu do ícone ou em **Ajustes > Preferências**.
 2. Clique em **Sair** no menu do ícone.
-3. Apague o WindFree da pasta Aplicativos. Se você roda pelo código-fonte, apague a pasta do projeto.
+3. Apague o WindFree da pasta Aplicativos (ou de `~/Applications`, se o instalador do Terminal usou essa). Se você roda pelo código-fonte, apague a pasta do projeto.
 4. Se quiser, apague também a pasta `~/Library/Application Support/WindFree`, onde ficam o `device.json` do app instalado, as configurações e o histórico de consumo, e a pasta `~/Library/Application Support/@smartthings`, onde o SmartThings CLI guarda o login.
 
 Apagou o app antes de desligar o início automático? Remova o arquivo que sobrou:

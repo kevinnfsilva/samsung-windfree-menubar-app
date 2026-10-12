@@ -1,7 +1,7 @@
 <div align="center">
   <img src="build/icon.png" width="128" height="128" alt="Ícone do WindFree" />
   <h1>WindFree</h1>
-  <p>Controle o ar-condicionado Samsung WindFree pela barra de menus do Mac, ou pela bandeja do Windows.</p>
+  <p>Controle o ar-condicionado Samsung WindFree pela barra de menus do Mac ou pela bandeja do Windows.</p>
   <p>
     <a href="https://github.com/kevinnfsilva/samsung-windfree-menubar-app/releases/latest"><img src="https://img.shields.io/github/v/release/kevinnfsilva/samsung-windfree-menubar-app?label=vers%C3%A3o" alt="Última versão" /></a>
     <img src="https://img.shields.io/badge/macOS-13%2B-111111?logo=apple&logoColor=white" alt="macOS 13 ou mais novo" />
@@ -37,8 +37,8 @@ Baixe o instalador na página da [última versão](https://github.com/kevinnfsil
 
 | Seu Mac | Arquivo |
 |---|---|
-| Apple Silicon (M1 ou mais novo) | `WindFree-1.1.0-arm64.dmg` |
-| Intel | `WindFree-1.1.0-x64.dmg` |
+| Apple Silicon (M1 ou mais novo) | o que termina em `-arm64.dmg` |
+| Intel | o que termina em `-x64.dmg` |
 
 Na dúvida, abra o menu Apple e escolha **Sobre Este Mac**. Se aparecer "Chip", é Apple Silicon. Se aparecer "Processador", é Intel.
 
@@ -48,15 +48,15 @@ Na dúvida, abra o menu Apple e escolha **Sobre Este Mac**. Se aparecer "Chip", 
 2. Abra o WindFree pela pasta Aplicativos. Na primeira vez o macOS bloqueia; veja logo abaixo como liberar.
 3. O app não abre janela nem aparece no Dock. Ele fica só na barra de menus, perto do relógio.
 
-O app não se atualiza sozinho. Para trocar de versão, baixe o DMG novo e substitua o app na pasta Aplicativos.
+O app não se atualiza sozinho. Para trocar de versão, saia do app, baixe o DMG novo e substitua o app na pasta Aplicativos. Talvez seja preciso liberar a abertura de novo.
 
 ### Liberar a primeira abertura
 
-O WindFree não é notarizado pela Apple. A notarização exige uma conta paga de desenvolvedor, que este projeto não tem, então o app sai só com uma assinatura local (ad-hoc). Por isso o macOS bloqueia a primeira abertura.
+O WindFree não é notarizado (autenticado) pela Apple. A notarização exige uma conta paga de desenvolvedor, que este projeto não tem, então o app sai só com uma assinatura local (ad-hoc). Por isso o macOS bloqueia a primeira abertura.
 
 Para liberar:
 
-1. Tente abrir o WindFree e feche o aviso que aparece.
+1. Tente abrir o WindFree e feche o aviso que aparece, sem mover o app para o Lixo.
 2. Abra **Ajustes do Sistema > Privacidade e Segurança** e role até a parte de **Segurança**.
 3. Clique em **Abrir Mesmo Assim** ao lado do aviso sobre o WindFree e confirme com a senha ou o Touch ID.
 
@@ -76,11 +76,11 @@ Se não quiser confiar num app não notarizado, dá para [rodar pelo código-fon
 2. O app procura o primeiro ar-condicionado da sua conta e guarda qual é no arquivo `device.json`.
 3. O ícone na barra de menus, que mostra `--` enquanto conecta, passa a mostrar a temperatura.
 
-Cada tentativa espera cerca de dois minutos pelo login. Se você demorar mais que isso, o painel mostra "Sem resposta do SmartThings": clique em **Tentar de novo**.
+Cada tentativa espera cerca de dois minutos pelo login. Se você demorar mais que isso, o painel mostra "Sem resposta do SmartThings": termine o login no navegador e clique em **Tentar de novo**. Enquanto isso o app não fica tentando sozinho, para não abrir uma aba nova a cada tentativa.
 
 Depois disso o app abre sozinho com o macOS. Dá para desligar no menu do ícone ou nos ajustes do painel.
 
-Com a barra de menus cheia, o que é comum nos MacBooks com notch, o ícone novo pode ficar escondido. Segure ⌘ e arraste os ícones para reorganizar, ou feche algum que não usa.
+Com a barra de menus cheia, o que é comum nos MacBooks com notch, o ícone novo pode ficar escondido. Segure ⌘ e arraste os ícones para reorganizar, ou feche algum que não usa. Abrir o WindFree de novo pela pasta Aplicativos também mostra o painel.
 
 ## O que dá para fazer
 
@@ -93,7 +93,7 @@ Com a barra de menus cheia, o que é comum nos MacBooks com notch, o ícone novo
 
 O desenho do ar no painel segue o estado real do aparelho. O vento muda de cor com o modo (azul no frio, verde no seco), de ritmo com a velocidade e balança conforme a direção escolhida. No WindFree a aleta fecha e o ar sai pelos microfuros, como no aparelho de verdade.
 
-Testado num Samsung WindFree de 9.000 BTUs só frio, modelo 2024. Outros WindFree devem funcionar, mas alguns ajustes podem não existir no seu modelo. Esse teste foi feito com o app original, no Windows. A versão para Mac foi testada só com um aparelho simulado, ainda não com um ar de verdade.
+Testado num Samsung WindFree de 9.000 BTUs só frio, modelo 2024. Outros WindFree devem funcionar, mas alguns ajustes podem não existir no seu modelo. Esse teste foi feito com o app original, no Windows. A versão para Mac foi testada só com um aparelho simulado, ainda não com um ar de verdade, e o lado Windows não foi testado de novo depois do porte.
 
 ## Uso
 
@@ -108,7 +108,7 @@ Testado num Samsung WindFree de 9.000 BTUs só frio, modelo 2024. Outros WindFre
 - O ícone é a temperatura programada. Com o ar ligado aparece um traço embaixo do número. Com o ar desligado o número fica mais apagado e sem o traço.
 - Clique no ícone para abrir o painel. Clique de novo, clique fora ou aperte Esc para fechar.
 - Clique com o botão direito (ou com dois dedos no trackpad) para abrir o menu: **Abrir painel**, **Ligar** ou **Desligar**, **Atualizar agora**, **Abrir com o macOS** e **Sair**.
-- Deixe o mouse parado sobre o ícone para ver se o ar está ligado e a temperatura e a umidade do ambiente.
+- Deixe o mouse parado sobre o ícone para ver se o ar está ligado, além da temperatura e da umidade do ambiente.
 - O app fica só na barra de menus, sem ícone no Dock. Para fechar de vez, use **Sair** no menu.
 
 ### O painel
@@ -121,7 +121,7 @@ Testado num Samsung WindFree de 9.000 BTUs só frio, modelo 2024. Outros WindFre
 
 Depois da primeira abertura o app passa a abrir sozinho quando você inicia a sessão no Mac. Para desligar, desmarque **Abrir com o macOS** no menu do ícone ou nos ajustes do painel.
 
-Por baixo é um LaunchAgent, o arquivo `~/Library/LaunchAgents/io.github.kevinnfsilva.windfree.plist`. O macOS pode avisar que um item em segundo plano foi adicionado. Se mover o app de lugar, abra-o de novo para atualizar o início automático.
+Por baixo dos panos, é um LaunchAgent: o arquivo `~/Library/LaunchAgents/io.github.kevinnfsilva.windfree.plist`. O macOS pode avisar que um item em segundo plano foi adicionado. Se mover o app de lugar, saia dele pelo menu **Sair** e abra de novo para atualizar o início automático.
 
 ## Mais de um ar na mesma conta
 
@@ -159,7 +159,7 @@ Funciona no Mac e no Windows. No Windows é o único jeito, porque não há inst
 Requisitos:
 
 - macOS 13 ou mais novo, ou Windows 10 ou 11
-- [Node.js](https://nodejs.org) 24 ou mais novo (é o que o SmartThings CLI pede)
+- [Node.js](https://nodejs.org) 24.8 ou mais novo (é o que o SmartThings CLI pede)
 - O ar já configurado no app SmartThings, numa conta Samsung
 
 Baixe o código:
@@ -190,7 +190,7 @@ Sem git, baixe pelo botão **Code > Download ZIP**, extraia e rode `npm install`
 
 O primeiro uso é igual ao do app instalado: o navegador abre para o login na conta Samsung, o app escolhe o primeiro ar da conta e o ícone aparece. O `device.json` fica na pasta do projeto.
 
-Depois disso ele abre sozinho com o sistema. Se mover a pasta de lugar, rode `npm start` de novo para atualizar o início automático.
+Depois disso ele abre sozinho com o sistema. Se mover a pasta de lugar, saia do app e rode `npm start` de novo para atualizar o início automático.
 
 ### Gerar os instaladores do Mac
 
@@ -270,8 +270,8 @@ Tudo roda no seu computador. O login fica guardado na pasta de configuração do
 ## Problemas comuns
 
 - **O macOS não deixa abrir o app**: é o bloqueio de apps não notarizados. Veja [Liberar a primeira abertura](#liberar-a-primeira-abertura). Se o aviso disser que o app "está danificado", use o comando `xattr` dessa mesma seção.
-- **O ícone não aparece na barra de menus do Mac**: com a barra cheia ele pode estar escondido atrás do notch. Segure ⌘ e arraste os ícones para reorganizar, ou feche algum que não usa.
-- **O app não abriu sozinho com o macOS**: confira se **Abrir com o macOS** está marcado no menu do ícone. O início automático só é registrado com o app num lugar fixo, como a pasta Aplicativos. Se você abriu direto do DMG, arraste para Aplicativos e abra de novo.
+- **O ícone não aparece na barra de menus do Mac**: com a barra cheia ele pode estar escondido atrás do notch. Segure ⌘ e arraste os ícones para reorganizar, ou feche algum que não usa. Para chegar ao painel mesmo assim, abra o WindFree de novo pela pasta Aplicativos.
+- **O app não abriu sozinho com o macOS**: confira se **Abrir com o macOS** está marcado no menu do ícone. O início automático só é registrado com o app num lugar fixo, como a pasta Aplicativos. Se você abriu direto do DMG, saia do app pelo menu **Sair**, arraste para Aplicativos e abra de novo.
 - **"Sem resposta do SmartThings"**: confira no app SmartThings se o ar está online e clique em "Tentar de novo" no painel. No primeiro uso, isso também aparece se o login no navegador demorar mais de dois minutos.
 - **O navegador abriu sozinho**: o login expirou depois de 30 dias sem uso. Entre de novo na conta Samsung.
 - **"Nenhum ar-condicionado encontrado"**: o login precisa ser na mesma conta em que o ar aparece no app SmartThings.
@@ -284,7 +284,7 @@ No Mac:
 1. Desligue **Abrir com o macOS** no menu do ícone ou nos ajustes do painel.
 2. Clique em **Sair** no menu do ícone.
 3. Apague o WindFree da pasta Aplicativos. Se você roda pelo código-fonte, apague a pasta do projeto.
-4. Se quiser, apague também a pasta `~/Library/Application Support/WindFree`, onde ficam o `device.json` do app instalado e as configurações.
+4. Se quiser, apague também a pasta `~/Library/Application Support/WindFree`, onde ficam o `device.json` do app instalado e as configurações, e a pasta `~/Library/Application Support/@smartthings`, onde o SmartThings CLI guarda o login.
 
 Apagou o app antes de desligar o início automático? Remova o arquivo que sobrou:
 

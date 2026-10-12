@@ -3,6 +3,7 @@ const { EventEmitter } = require('node:events');
 const os = require('node:os');
 const path = require('node:path');
 
+const IS_MAC = process.platform === 'darwin';
 const AC_SCRIPT = path.join(__dirname, 'ac.mjs');
 const FLUSH_DELAY_MS = 600;
 const RUN_TIMEOUT_MS = 120_000;
@@ -106,11 +107,15 @@ class AcBridge extends EventEmitter {
   #start(tokens, kind) {
     this.#run = kind;
     this.#changed();
-    // System Node on purpose: under Electron's runtime the SmartThings CLI's yargs misreads argv.
+    // macOS runs the script on Electron's own Node, so the app needs no Node installed. Windows keeps the system one.
     const child = execFile(
-      'node',
+      IS_MAC ? process.execPath : 'node',
       [this.#script, ...tokens],
-      { timeout: RUN_TIMEOUT_MS, windowsHide: true },
+      {
+        timeout: RUN_TIMEOUT_MS,
+        windowsHide: true,
+        ...(IS_MAC ? { env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' } } : {}),
+      },
       (error, stdout, stderr) => this.#finish(error, stdout, stderr),
     );
     if (kind === RunKind.Refresh) lowerPriority(child.pid);

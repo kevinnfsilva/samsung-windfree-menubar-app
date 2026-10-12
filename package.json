@@ -1,18 +1,64 @@
 {
-  "name": "samsung-windfree-tray-app",
+  "name": "samsung-windfree-menubar-app",
   "productName": "WindFree",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
-  "description": "Painel na bandeja do Windows para controlar ar-condicionado Samsung WindFree pelo SmartThings",
+  "description": "Painel na barra de menus do Mac ou na bandeja do Windows para controlar ar-condicionado Samsung WindFree pelo SmartThings",
+  "homepage": "https://github.com/kevinnfsilva/samsung-windfree-menubar-app#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevinnfsilva/samsung-windfree-menubar-app.git"
+  },
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder --mac"
   },
   "devDependencies": {
-    "electron": "^44.7.0"
+    "electron": "^44.7.0",
+    "electron-builder": "^26.15.3"
   },
   "dependencies": {
     "@smartthings/cli": "^2.1.2",
     "lucide": "^1.55.0"
+  },
+  "build": {
+    "appId": "io.github.kevinnfsilva.windfree",
+    "artifactName": "WindFree-${version}-${arch}.${ext}",
+    "asar": false,
+    "npmRebuild": false,
+    "publish": null,
+    "files": [
+      "main.js",
+      "bridge.js",
+      "preload.js",
+      "ac.mjs",
+      "smartthings.mjs",
+      "panel",
+      "!node_modules/lucide/dist/{cjs,esm}",
+      "!node_modules/lucide/dist/umd/{lucide.js,*.map}",
+      "!node_modules/{esbuild,@esbuild,fsevents,tsx}/**"
+    ],
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "identity": "-",
+      "hardenedRuntime": false,
+      "notarize": false,
+      "extendInfo": {
+        "LSUIElement": true
+      }
+    },
+    "dmg": {
+      "writeUpdateInfo": false
+    }
   }
 }

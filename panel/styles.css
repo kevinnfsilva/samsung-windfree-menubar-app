@@ -35,11 +35,16 @@ body {
 
 body {
   padding: 20px;
-  font-family: Bahnschrift, 'Segoe UI Variable Text', 'Segoe UI', sans-serif;
+  font-family: Bahnschrift, 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif;
   font-size: 14px;
   color: var(--porcelain);
   cursor: default;
   user-select: none;
+}
+
+/* On macOS the panel hangs just under the menu bar. */
+:root[data-platform='darwin'] body {
+  padding-top: 6px;
 }
 
 button {
@@ -144,10 +149,14 @@ svg.lucide {
   pointer-events: none;
 }
 
+:root[data-platform='darwin'] .panel {
+  --enter-from: -12px;
+}
+
 @keyframes panel-in {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.985);
+    transform: translateY(var(--enter-from, 12px)) scale(0.985);
   }
 }
 
@@ -290,7 +299,7 @@ svg.lucide {
 }
 
 .unit-display {
-  font: 600 10px Bahnschrift, sans-serif;
+  font: 600 10px Bahnschrift, system-ui, sans-serif;
   letter-spacing: 0.04em;
   fill: #6fc3ee;
   opacity: 0;

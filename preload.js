@@ -5,6 +5,7 @@ function listen(channel, callback) {
 }
 
 contextBridge.exposeInMainWorld('ac', {
+  platform: process.platform,
   getState: () => ipcRenderer.invoke('state:get'),
   set: (key, value) => ipcRenderer.send('ac:set', key, value),
   refresh: () => ipcRenderer.send('ac:refresh'),

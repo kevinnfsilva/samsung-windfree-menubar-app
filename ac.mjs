@@ -5,8 +5,9 @@ import { setTimeout as sleep } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
-const CLI_ENTRY = path.join(ROOT, 'node_modules', '@smartthings', 'cli', 'dist', 'src', 'run.js');
-const DEVICE_FILE = path.join(ROOT, 'device.json');
+const CLI_ENTRY = path.join(ROOT, 'smartthings.mjs');
+// The packaged app can't write inside its own signed bundle, so it names another folder for device.json.
+const DEVICE_FILE = path.join(process.env.WINDFREE_DATA_DIR ?? ROOT, 'device.json');
 const CONFIRM_ATTEMPTS = 4;
 const CONFIRM_INTERVAL_MS = 1500;
 

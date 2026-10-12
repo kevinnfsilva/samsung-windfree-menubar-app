@@ -1,12 +1,14 @@
 const TEMP_MIN = 16;
 const TEMP_MAX = 30;
 const SVG_NS = 'http://www.w3.org/2000/svg';
+const IS_MAC = window.ac.platform === 'darwin';
 const TRAY_ICON_SIZES = [
   { size: 16, scaleFactor: 1 },
   { size: 20, scaleFactor: 1.25 },
   { size: 24, scaleFactor: 1.5 },
   { size: 32, scaleFactor: 2 },
 ];
+const MENU_BAR_ICON = { width: 22, height: 18, scaleFactors: [1, 2] };
 
 const MENUS = {
   modo: {
@@ -276,11 +278,33 @@ function drawTrayIcon(size, device, tint) {
   return canvas.toDataURL('image/png');
 }
 
+// macOS uses the icon as a template: only its alpha counts and the system picks the colour.
+function drawMenuBarIcon(scaleFactor, device) {
+  const { width, height } = MENU_BAR_ICON;
+  const canvas = document.createElement('canvas');
+  canvas.width = width * scaleFactor;
+  canvas.height = height * scaleFactor;
+  const context = canvas.getContext('2d');
+  context.scale(scaleFactor, scaleFactor);
+  context.globalAlpha = device?.ligado ? 1 : 0.5;
+  context.font = '600 14px system-ui';
+  context.textAlign = 'center';
+  context.fillText(device ? String(device.temp) : '--', width / 2, 12.5);
+  if (device?.ligado) context.fillRect(4, 15, width - 8, 1.5);
+  return canvas.toDataURL('image/png');
+}
+
 function renderTrayIcon() {
   const device = view?.device;
   const key = [device?.temp, device?.ligado, device?.modo, darkTaskbar].join('|');
   if (key === trayIconKey) return;
   trayIconKey = key;
+  if (IS_MAC) {
+    window.ac.setTrayIcon(
+      MENU_BAR_ICON.scaleFactors.map((scaleFactor) => ({ scaleFactor, dataURL: drawMenuBarIcon(scaleFactor, device) })),
+    );
+    return;
+  }
   const tint = getComputedStyle(panel).getPropertyValue('--tint').trim();
   window.ac.setTrayIcon(
     TRAY_ICON_SIZES.map(({ size, scaleFactor }) => ({ scaleFactor, dataURL: drawTrayIcon(size, device, tint) })),
@@ -471,6 +495,12 @@ window.ac.onState((next) => {
   view = next;
   render();
 });
+
+document.documentElement.dataset.platform = window.ac.platform;
+if (IS_MAC) {
+  byId('autostart-title').textContent = 'Abrir com o macOS';
+  byId('autostart').setAttribute('aria-label', 'Abrir com o macOS');
+}
 
 lucide.createIcons();
 buildStreaks();

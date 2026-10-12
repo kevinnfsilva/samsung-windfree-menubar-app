@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  WindFree app icon, 1024 x 1024 master. Regenerate icon.png and icon.icns with: node scripts/make-icon.mjs
+  macOS grid: 824 x 824 body centred on the canvas, corner radius 185, soft shadow kept inside the canvas.
+  Colours and gradients follow panel/styles.css and the .scene art in panel/index.html.
+  There are two drawings: #art for 64 px and up, and #art-small (hidden in an editor) for the 16 and 32 px sizes.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>WindFree</title>
+  <style>
+    /* Rendered at 32 px or smaller, the icon swaps to the heavier drawing made for the pixel grid. */
+    @media (max-width: 32px) {
+      #art { display: none; }
+      #art-small { display: inline; }
+    }
+  </style>
+  <defs>
+    <!-- Squircle: the 824 square with radius 185 and 60% corner smoothing, so each corner is curve, arc, curve -->
+    <path id="body" d="M628 100 C731.61 100 783.41 100 822.99 120.16 A185 185 0 0 1 903.84 201.01 C924 240.59 924 292.39 924 396 V628 C924 731.61 924 783.41 903.84 822.99 A185 185 0 0 1 822.99 903.84 C783.41 924 731.61 924 628 924 H396 C292.39 924 240.59 924 201.01 903.84 A185 185 0 0 1 120.16 822.99 C100 783.41 100 731.61 100 628 V396 C100 292.39 100 240.59 120.16 201.01 A185 185 0 0 1 201.01 120.16 C240.59 100 292.39 100 396 100 Z" />
+    <clipPath id="clip-body">
+      <use xlink:href="#body" />
+    </clipPath>
+
+    <radialGradient id="g-top">
+      <stop offset="0" stop-color="#1c2128" />
+      <stop offset="1" stop-color="#1c2128" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="g-spot">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.08" />
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="g-glow">
+      <stop offset="0" stop-color="#a7d7f1" stop-opacity="0.2" />
+      <stop offset="0.5" stop-color="#a7d7f1" stop-opacity="0.08" />
+      <stop offset="1" stop-color="#a7d7f1" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="g-edge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.2" />
+      <stop offset="0.35" stop-color="#ffffff" stop-opacity="0.08" />
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.05" />
+    </linearGradient>
+
+    <linearGradient id="g-unit" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" />
+      <stop offset="0.5" stop-color="#f2f4f6" />
+      <stop offset="1" stop-color="#dde2e7" />
+    </linearGradient>
+    <linearGradient id="g-curve" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0d1a26" stop-opacity="0.14" />
+      <stop offset="0.09" stop-color="#0d1a26" stop-opacity="0" />
+      <stop offset="0.88" stop-color="#0d1a26" stop-opacity="0" />
+      <stop offset="1" stop-color="#0d1a26" stop-opacity="0.16" />
+    </linearGradient>
+    <linearGradient id="g-under" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c9d0d7" />
+      <stop offset="1" stop-color="#9ea7b1" />
+    </linearGradient>
+    <linearGradient id="g-outlet" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#07090b" />
+      <stop offset="1" stop-color="#262c33" />
+    </linearGradient>
+    <linearGradient id="g-air" gradientUnits="userSpaceOnUse" x1="0" y1="504" x2="0" y2="800">
+      <stop offset="0" stop-color="#a7d7f1" />
+      <stop offset="0.4" stop-color="#a7d7f1" stop-opacity="0.74" />
+      <stop offset="0.7" stop-color="#a7d7f1" stop-opacity="0.32" />
+      <stop offset="0.88" stop-color="#a7d7f1" stop-opacity="0.09" />
+      <stop offset="1" stop-color="#a7d7f1" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="g-air-small" gradientUnits="userSpaceOnUse" x1="0" y1="512" x2="0" y2="832">
+      <stop offset="0" stop-color="#a7d7f1" />
+      <stop offset="1" stop-color="#a7d7f1" stop-opacity="0" />
+    </linearGradient>
+
+    <filter id="f-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="13" />
+    </filter>
+    <filter id="f-contact" x="-20%" y="-200%" width="140%" height="500%">
+      <feGaussianBlur stdDeviation="10" />
+    </filter>
+    <filter id="f-air" x="-40%" y="-20%" width="180%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="halo" />
+      <feMerge>
+        <feMergeNode in="halo" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter id="f-glow" x="-200%" y="-200%" width="500%" height="500%">
+      <feGaussianBlur stdDeviation="5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Body: graphite tile with the panel's top highlight and hairline edge -->
+  <use xlink:href="#body" transform="translate(0 12)" fill="#000000" opacity="0.38" filter="url(#f-shadow)" />
+  <use xlink:href="#body" fill="#101317" />
+  <g clip-path="url(#clip-body)">
+    <ellipse cx="512" cy="100" rx="771" ry="356" fill="url(#g-top)" />
+    <ellipse cx="512" cy="400" rx="430" ry="240" fill="url(#g-spot)" />
+    <ellipse cx="512" cy="640" rx="400" ry="230" fill="url(#g-glow)" />
+    <use xlink:href="#body" fill="none" stroke="url(#g-edge)" stroke-width="6" />
+  </g>
+
+  <!-- Artwork for 64 px and up: three airflow strands coming out from under the indoor unit -->
+  <g id="art">
+    <g fill="none" stroke="url(#g-air)" stroke-width="40" stroke-linecap="round" filter="url(#f-air)">
+      <path d="M368 484 C368 616 350 708 296 800" />
+      <path d="M512 484 V804" />
+      <path d="M656 484 C656 616 674 708 728 800" />
+    </g>
+    <ellipse cx="512" cy="512" rx="290" ry="12" fill="#000000" opacity="0.6" filter="url(#f-contact)" />
+    <rect x="208" y="288" width="608" height="176" rx="44" fill="url(#g-unit)" />
+    <rect x="208" y="288" width="608" height="176" rx="44" fill="url(#g-curve)" />
+    <path d="M248 291.5 H776" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
+    <circle cx="768" cy="336" r="8" fill="#6fc3ee" filter="url(#f-glow)" />
+    <path d="M224 458 H800 C800 480 785 501 760 504 H264 C239 501 224 480 224 458 Z" fill="url(#g-under)" />
+    <rect x="284" y="470" width="456" height="26" rx="13" fill="url(#g-outlet)" />
+    <rect x="279" y="490" width="466" height="10" rx="5" fill="#e2e7ec" />
+  </g>
+
+  <!-- Artwork for 16 and 32 px: the same picture with every edge on a multiple of 32, which is one pixel at 32 px -->
+  <g id="art-small" display="none">
+    <path d="M352 512 V832 M512 512 V832 M672 512 V832" fill="none" stroke="url(#g-air-small)" stroke-width="64" />
+    <rect x="192" y="256" width="640" height="192" rx="48" fill="url(#g-unit)" />
+    <path d="M224 448 H800 V480 A32 32 0 0 1 768 512 H256 A32 32 0 0 1 224 480 Z" fill="#b3bbc4" />
+    <rect x="288" y="448" width="448" height="32" fill="#161a1f" />
+  </g>
+</svg>

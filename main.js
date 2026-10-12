@@ -42,6 +42,15 @@ function launchAgentFile() {
   return path.join(app.getPath('home'), 'Library', 'LaunchAgents', `${LAUNCH_AGENT_LABEL}.plist`);
 }
 
+function isWritable(file) {
+  try {
+    fs.accessSync(file, fs.constants.W_OK);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function plistString(value) {
   const escaped = value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
   return `<string>${escaped}</string>`;
@@ -56,7 +65,8 @@ function setLaunchAgent(enabled) {
     return;
   }
   // Run from the disk image, or from the random path Gatekeeper gives a fresh download, the app is gone by next login.
-  if (/^\/Volumes\/|\/AppTranslocation\//.test(process.execPath)) return;
+  const onDiskImage = process.execPath.startsWith('/Volumes/') && !isWritable(process.execPath);
+  if (onDiskImage || process.execPath.includes('/AppTranslocation/')) return;
   const programArguments = app.isPackaged ? [process.execPath] : [process.execPath, app.getAppPath()];
   const plist = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -80,15 +90,21 @@ function setLaunchAgent(enabled) {
   // Rewriting an identical file would make macOS announce the background item again on every launch.
   if (fs.existsSync(file) && fs.readFileSync(file, 'utf8') === plist) return;
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, plist);
+  // launchd refuses agents that others can write to.
+  fs.writeFileSync(file, plist, { mode: 0o644 });
 }
 
-// Unpackaged, electron.exe needs the app folder as an argument or it boots the default app.
 function setAutostart(enabled) {
   fs.writeFileSync(settingsFile(), JSON.stringify({ ...readSettings(), autostart: enabled }));
   if (IS_MAC) {
-    setLaunchAgent(enabled);
+    try {
+      setLaunchAgent(enabled);
+    } catch (error) {
+      // A LaunchAgents folder the user can't write to must not keep the app from starting.
+      console.error(error);
+    }
   } else {
+    // Unpackaged, electron.exe needs the app folder as an argument or it boots the default app.
     const launch = app.isPackaged ? {} : { path: process.execPath, args: [app.getAppPath()] };
     app.setLoginItemSettings({ openAtLogin: enabled, name: LOGIN_ITEM_NAME, ...launch });
   }
@@ -177,7 +193,8 @@ function schedulePoll() {
   clearTimeout(pollTimer);
   const delay = panel.isVisible() ? POLL_VISIBLE_MS : POLL_HIDDEN_MS;
   pollTimer = setTimeout(() => {
-    bridge.refresh();
+    // After a timeout the first login tab is still waiting; polling again would open one more tab each time.
+    if (!bridge.timedOut) bridge.refresh();
     schedulePoll();
   }, delay);
 }
@@ -259,6 +276,8 @@ function start() {
   nativeTheme.on('updated', () => panel.webContents.send('theme', taskbarIsDark()));
   powerMonitor.on('resume', () => bridge.refresh());
   app.on('second-instance', showPanel);
+  // Opening the app again from Finder is the way in when the menu bar has no room for the icon.
+  if (IS_MAC) app.on('activate', showPanel);
 
   bridge.refresh();
   schedulePoll();

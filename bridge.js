@@ -43,6 +43,7 @@ class AcBridge extends EventEmitter {
   #error = null;
   #updatedAt = null;
   #flushTimer = null;
+  #timedOut = false;
 
   constructor({ script = AC_SCRIPT } = {}) {
     super();
@@ -51,6 +52,11 @@ class AcBridge extends EventEmitter {
 
   get updatedAt() {
     return this.#updatedAt;
+  }
+
+  // A run only gets killed for taking too long when it sits waiting for the login in the browser.
+  get timedOut() {
+    return this.#timedOut;
   }
 
   view() {
@@ -107,7 +113,8 @@ class AcBridge extends EventEmitter {
   #start(tokens, kind) {
     this.#run = kind;
     this.#changed();
-    // macOS runs the script on Electron's own Node, so the app needs no Node installed. Windows keeps the system one.
+    // macOS runs the script on Electron's own Node, so the app needs no Node installed.
+    // Windows keeps the system one until that path is tested there.
     const child = execFile(
       IS_MAC ? process.execPath : 'node',
       [this.#script, ...tokens],
@@ -124,6 +131,7 @@ class AcBridge extends EventEmitter {
   #finish(error, stdout, stderr) {
     this.#run = RunKind.Idle;
     this.#inflight = new Map();
+    this.#timedOut = Boolean(error?.killed);
     try {
       if (error) throw new Error(stderr.trim().split('\n')[0] || error.message);
       const { pendente = [], ...device } = JSON.parse(stdout);

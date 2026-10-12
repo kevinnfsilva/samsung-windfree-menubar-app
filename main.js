@@ -2,6 +2,16 @@ const { app, BrowserWindow, Menu, Tray, ipcMain, nativeImage, nativeTheme, power
 const fs = require('node:fs');
 const path = require('node:path');
 const { AcBridge } = require('./bridge');
+const { appMenuTemplate } = require('./lib/app-menu');
+const { isValidAction, isValidChange } = require('./lib/commands');
+const { Favorites } = require('./lib/favorites');
+const { History } = require('./lib/history');
+const { createI18n, resolveLanguage } = require('./lib/i18n');
+const { Notifier } = require('./lib/notifications');
+const { Scheduler } = require('./lib/scheduler');
+const { SettingsStore } = require('./lib/settings');
+const { Shortcut } = require('./lib/shortcut');
+const { menuTemplate, tooltipFor } = require('./lib/tray-menu');
 
 const IS_MAC = process.platform === 'darwin';
 // The window leaves room around the panel for its shadow; on macOS the top margin is thinner so it hugs the menu bar.
@@ -10,32 +20,30 @@ const POLL_VISIBLE_MS = 15_000;
 const POLL_HIDDEN_MS = 60_000;
 const STALE_AFTER_MS = 5_000;
 const REOPEN_GUARD_MS = 300;
+const TRAY_SETTLE_MS = 100;
+const QUIT_GRACE_MS = 3_000;
+const QUIT_POLL_MS = 100;
 const LOGIN_ITEM_NAME = 'WindFree';
 const LAUNCH_AGENT_LABEL = 'io.github.kevinnfsilva.windfree';
-const AUTOSTART_LABEL = IS_MAC ? 'Abrir com o macOS' : 'Abrir com o Windows';
 
 const bridge = new AcBridge();
+let settings;
+let history;
+let favorites;
+let scheduler;
+let notifier;
+let shortcut;
+let i18n;
 let tray;
 let panel;
 let pollTimer;
 let lastBlurAt = 0;
-let menuPowerState;
+let menuKey;
 let contextMenu;
-
-function settingsFile() {
-  return path.join(app.getPath('userData'), 'settings.json');
-}
-
-function readSettings() {
-  try {
-    return JSON.parse(fs.readFileSync(settingsFile(), 'utf8'));
-  } catch {
-    return {};
-  }
-}
+let quitting = false;
 
 function isAutostartEnabled() {
-  return readSettings().autostart ?? true;
+  return settings.get().autostart;
 }
 
 function launchAgentFile() {
@@ -67,7 +75,8 @@ function setLaunchAgent(enabled) {
   // Run from the disk image, or from the random path Gatekeeper gives a fresh download, the app is gone by next login.
   const onDiskImage = process.execPath.startsWith('/Volumes/') && !isWritable(process.execPath);
   if (onDiskImage || process.execPath.includes('/AppTranslocation/')) return;
-  const programArguments = app.isPackaged ? [process.execPath] : [process.execPath, app.getAppPath()];
+  // The trailing flag tells the launch at login from one the user asked for, which opens the panel.
+  const programArguments = [...(app.isPackaged ? [process.execPath] : [process.execPath, app.getAppPath()]), '--hidden'];
   const plist = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -94,8 +103,8 @@ function setLaunchAgent(enabled) {
   fs.writeFileSync(file, plist, { mode: 0o644 });
 }
 
+// Applies the setting to the system; the setting itself is saved by the settings store.
 function setAutostart(enabled) {
-  fs.writeFileSync(settingsFile(), JSON.stringify({ ...readSettings(), autostart: enabled }));
   if (IS_MAC) {
     try {
       setLaunchAgent(enabled);
@@ -109,6 +118,18 @@ function setAutostart(enabled) {
     app.setLoginItemSettings({ openAtLogin: enabled, name: LOGIN_ITEM_NAME, ...launch });
   }
   updateMenu(true);
+}
+
+// The Dock icon and the menu bar that comes with it go together; without them the app lives in the tray alone.
+function applyDock(enabled) {
+  if (enabled) {
+    app.dock.show().catch(console.error);
+    Menu.setApplicationMenu(Menu.buildFromTemplate(appMenuTemplate(app.name)));
+  } else {
+    app.dock.hide();
+    // The default menu's shortcuts would let Cmd+W destroy the panel.
+    Menu.setApplicationMenu(null);
+  }
 }
 
 function taskbarIsDark() {
@@ -161,6 +182,11 @@ function positionPanel() {
   panel.setPosition(Math.max(workArea.x, Math.min(centered, rightmost)), y);
 }
 
+// A status item takes a moment to move after its icon changes width, and the open panel hangs from its middle.
+function placePanelWhenSettled() {
+  setTimeout(positionPanel, TRAY_SETTLE_MS);
+}
+
 function showPanel() {
   positionPanel();
   panel.webContents.send('panel:show');
@@ -193,43 +219,69 @@ function schedulePoll() {
   clearTimeout(pollTimer);
   const delay = panel.isVisible() ? POLL_VISIBLE_MS : POLL_HIDDEN_MS;
   pollTimer = setTimeout(() => {
-    // After a timeout the first login tab is still waiting; polling again would open one more tab each time.
-    if (!bridge.timedOut) bridge.refresh();
+    // Without a session, or after a timeout, a poll would only fail again; the user retries by hand.
+    if (!bridge.paused) bridge.refresh();
     schedulePoll();
   }, delay);
 }
 
-function tooltipFor({ device }) {
-  if (!device) return 'WindFree';
-  const power = device.ligado ? `ligado em ${device.temp} °C` : 'desligado';
-  return `${device.nome ?? 'Ar-condicionado'} ${power}\nAmbiente com ${device.ambiente} °C e ${device.umidade}% de umidade`;
-}
-
 function updateMenu(force = false) {
-  const { device } = bridge.view();
-  const powerState = device?.ligado;
-  if (!force && powerState === menuPowerState) return;
-  menuPowerState = powerState;
-  contextMenu = Menu.buildFromTemplate([
-    { label: 'Abrir painel', click: showPanel },
-    {
-      label: powerState ? 'Desligar' : 'Ligar',
-      enabled: Boolean(device),
-      click: () => bridge.set('ligado', !powerState),
-    },
-    { label: 'Atualizar agora', click: () => bridge.refresh() },
-    { type: 'separator' },
-    {
-      label: AUTOSTART_LABEL,
-      type: 'checkbox',
-      checked: isAutostartEnabled(),
-      click: (item) => setAutostart(item.checked),
-    },
-    { type: 'separator' },
-    { label: 'Sair', click: () => app.quit() },
-  ]);
+  const view = bridge.view();
+  const { favoritos } = settings.get();
+  const autostart = isAutostartEnabled();
+  const key = JSON.stringify([view.device?.ligado, Boolean(view.device), view.login, favoritos.map(({ id, nome }) => [id, nome]), autostart, i18n.language]);
+  if (!force && key === menuKey) return;
+  menuKey = key;
+  contextMenu = Menu.buildFromTemplate(
+    menuTemplate({
+      view,
+      favoritos,
+      autostart,
+      i18n,
+      actions: {
+        showPanel,
+        login: () => bridge.login(),
+        cancelLogin: () => bridge.cancelLogin(),
+        setPower: (on) => setByHand('ligado', on),
+        applyFavorite: applyFavoriteByHand,
+        refresh: () => bridge.refresh(),
+        setAutostart: (enabled) => settings.update({ autostart: enabled }),
+        quit: () => app.quit(),
+      },
+    }),
+  );
   // A menu attached to a macOS status item takes over the left click, so there it only pops up on right-click.
   if (!IS_MAC) tray.setContextMenu(contextMenu);
+}
+
+// What the user does by hand wins over a scheduled command that is still being retried for the same unit.
+function setByHand(key, value) {
+  if (!isValidChange(key, value)) return;
+  if (key === 'ligado') scheduler.cancelRetries(bridge.view().device?.id);
+  bridge.set(key, value);
+}
+
+function applyFavoriteByHand(id) {
+  scheduler.cancelRetries(bridge.view().device?.id);
+  return favorites.apply(id);
+}
+
+// A change made a moment ago may still be waiting to go out or be on its way; the bridge would kill it on the way out.
+function commandsOnTheWay() {
+  return bridge.view().syncing || scheduler.busy;
+}
+
+function languageSetting() {
+  return resolveLanguage(settings.get().idioma, app.getLocale());
+}
+
+// The tray menu and tooltip are rebuilt here; the panel redraws itself when it hears about the new language.
+function applyLanguage() {
+  const language = languageSetting();
+  if (language === i18n.language) return;
+  i18n = createI18n(language);
+  panel.webContents.send('locale', language);
+  tray.setToolTip(tooltipFor(bridge.view(), i18n));
 }
 
 // As a template image, macOS repaints the icon to suit whatever sits behind the menu bar.
@@ -243,11 +295,37 @@ function trayImage(images) {
 function start() {
   // Writing inside the app bundle would break its code signature, so device.json goes next to the settings.
   if (app.isPackaged) process.env.WINDFREE_DATA_DIR = app.getPath('userData');
-  if (IS_MAC) {
-    app.dock.hide();
-    // The default menu's shortcuts would let Cmd+W destroy the panel.
-    Menu.setApplicationMenu(null);
-  }
+  // Windows ties notifications to this id.
+  if (!IS_MAC) app.setAppUserModelId(LAUNCH_AGENT_LABEL);
+
+  shortcut = new Shortcut(togglePanel);
+  settings = new SettingsStore(path.join(app.getPath('userData'), 'settings.json'), {
+    // A key another app already owns can't be registered, so the setting turns itself off instead of lying.
+    adjust: (next) => {
+      if (!shortcut.apply(next.atalho)) next.atalho.ativo = false;
+    },
+  });
+  // Registered before anything else listens, so the panel hears every change in order even when a later listener changes settings in turn.
+  settings.on('change', (next, previous) => {
+    panel.webContents.send('settings', next);
+    if (next.idioma !== previous.idioma) applyLanguage();
+    if (next.autostart !== previous.autostart) setAutostart(next.autostart);
+    if (IS_MAC && next.dock !== previous.dock) applyDock(next.dock);
+    updateMenu();
+  });
+  i18n = createI18n(languageSetting());
+  if (IS_MAC) applyDock(settings.get().dock);
+  history = new History(path.join(app.getPath('userData'), 'historico.json'));
+  favorites = new Favorites({ settings, bridge });
+  notifier = new Notifier({ settings, bridge, onClick: showPanel, i18n: () => i18n });
+  scheduler = new Scheduler({
+    settings,
+    bridge,
+    favorites,
+    notify: (aparelho, key) => notifier.alert(aparelho.nome, key),
+    file: path.join(app.getPath('userData'), 'pendentes.json'),
+  });
+
   panel = createPanel();
   tray = new Tray(nativeImage.createEmpty());
   tray.setToolTip('WindFree');
@@ -256,31 +334,91 @@ function start() {
     tray.setIgnoreDoubleClickEvents(true);
     tray.on('right-click', () => tray.popUpContextMenu(contextMenu));
   }
+  // An empty update registers a shortcut saved as active, and turns the setting off when the key is no longer free.
+  settings.update({});
   updateMenu(true);
   setAutostart(isAutostartEnabled());
 
   bridge.on('change', (view) => {
     panel.webContents.send('state', view);
-    tray.setToolTip(tooltipFor(view));
+    tray.setToolTip(tooltipFor(view, i18n));
     updateMenu();
+    history.record(view);
+    notifier.check(view);
   });
 
-  ipcMain.handle('state:get', () => ({ view: bridge.view(), darkTaskbar: taskbarIsDark() }));
+  ipcMain.handle('state:get', () => ({ view: bridge.view(), darkTaskbar: taskbarIsDark(), settings: settings.get(), locale: i18n.language }));
   ipcMain.handle('autostart:get', isAutostartEnabled);
-  ipcMain.on('autostart:set', (_event, enabled) => setAutostart(enabled));
-  ipcMain.on('ac:set', (_event, key, value) => bridge.set(key, value));
+  ipcMain.on('autostart:set', (_event, enabled) => settings.update({ autostart: enabled }));
+  ipcMain.on('ac:set', (_event, key, value) => setByHand(key, value));
   ipcMain.on('ac:refresh', () => bridge.refresh());
+  ipcMain.on('ac:login', () => bridge.login());
+  ipcMain.on('ac:cancel-login', () => bridge.cancelLogin());
+  ipcMain.on('ac:list-devices', () => bridge.listDevices());
+  ipcMain.on('ac:use-device', (_event, id) => {
+    if (typeof id === 'string') bridge.useDevice(id);
+  });
+  ipcMain.on('ac:run', (_event, action) => {
+    if (isValidAction(action)) bridge.run(action);
+  });
+  ipcMain.handle('settings:get', () => settings.get());
+  ipcMain.handle('settings:update', (_event, patch) => settings.update(patch));
+  ipcMain.handle('favorite:save', (_event, nome) => favorites.save(nome));
+  ipcMain.handle('favorite:apply', (_event, id) => applyFavoriteByHand(id));
+  ipcMain.handle('favorite:delete', (_event, id) => favorites.remove(id));
+  ipcMain.handle('timer:set', (_event, acao, minutos) => scheduler.setTimer(acao, minutos));
+  ipcMain.handle('timer:clear', () => scheduler.clearTimer());
+  ipcMain.handle('schedule:save', (_event, agenda) => scheduler.saveSchedule(agenda));
+  ipcMain.handle('schedule:delete', (_event, id) => scheduler.deleteSchedule(id));
+  ipcMain.handle('history:get', () => history.get(bridge.view().device?.id));
   ipcMain.on('panel:hide', hidePanel);
-  ipcMain.on('tray:icon', (_event, images) => tray.setImage(trayImage(images)));
+  ipcMain.on('tray:icon', (_event, images) => {
+    const { width } = tray.getBounds();
+    tray.setImage(trayImage(images));
+    if (panel.isVisible() && tray.getBounds().width !== width) placePanelWhenSettled();
+  });
 
   nativeTheme.on('updated', () => panel.webContents.send('theme', taskbarIsDark()));
-  powerMonitor.on('resume', () => bridge.refresh());
+  powerMonitor.on('resume', () => {
+    if (!bridge.paused) bridge.refresh();
+    scheduler.check();
+  });
   app.on('second-instance', showPanel);
   // Opening the app again from Finder is the way in when the menu bar has no room for the icon.
   if (IS_MAC) app.on('activate', showPanel);
+  app.on('before-quit', (event) => {
+    if (quitting || !commandsOnTheWay()) return;
+    // Quitting is put off for a moment, never longer than the grace period, so that the change still goes out.
+    event.preventDefault();
+    quitting = true;
+    const deadline = Date.now() + QUIT_GRACE_MS;
+    const wait = setInterval(() => {
+      if (commandsOnTheWay() && Date.now() < deadline) return;
+      clearInterval(wait);
+      app.quit();
+    }, QUIT_POLL_MS);
+  });
+  app.on('will-quit', () => {
+    scheduler.stop();
+    notifier.stop();
+    shortcut.dispose();
+    history.flush();
+    bridge.dispose();
+  });
+
+  // Opened by hand, the panel greets the user; the LaunchAgent passes --hidden so that a login stays quiet.
+  if (IS_MAC && !process.argv.includes('--hidden')) {
+    panel.webContents.once('did-finish-load', () => {
+      showPanel();
+      // The tray icon is still being drawn at this point.
+      placePanelWhenSettled();
+    });
+  }
 
   bridge.refresh();
   schedulePoll();
+  scheduler.start();
+  notifier.start();
 }
 
 if (app.requestSingleInstanceLock()) {

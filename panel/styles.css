@@ -4,25 +4,185 @@
   initial-value: 0.5;
 }
 
+/*
+  Colours live here and nowhere else. The values below are the dark theme; the light theme redefines them in the
+  prefers-color-scheme block right after this one. Names come from the dark palette, so a few read oddly in light:
+  porcelain is the primary ink (pale on dark, near-black on light), graphite is the panel itself, slate the cards on it,
+  slate-raised the menus and buttons above them and field the inset wells.
+*/
 :root {
-  color-scheme: dark;
+  color-scheme: light dark;
+
+  /* Surfaces */
   --graphite: #101317;
+  --graphite-glow: #1c2128;
+  --graphite-glow-clear: rgba(28, 33, 40, 0);
   --slate: #181c21;
   --slate-raised: #20252b;
+  --field: #0e1114;
   --hairline: rgba(255, 255, 255, 0.07);
+  --wash: rgba(255, 255, 255, 0.05);
+  --wash-strong: rgba(255, 255, 255, 0.09);
+  --wash-faint: rgba(255, 255, 255, 0.025);
+  --wash-cell: rgba(255, 255, 255, 0.03);
+  --wash-item: rgba(255, 255, 255, 0.06);
+  --ring-strong: rgba(255, 255, 255, 0.1);
+  --hover-mix: #ffffff;
+  --focus-mix: #ffffff;
+  --accent-lift: #ffffff;
+  --scrollbar: rgba(255, 255, 255, 0.14);
+
+  /* Shadows (whole stacks, because the light ones differ in structure as well as colour) */
+  --panel-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 10px 22px rgba(0, 0, 0, 0.45),
+    0 1px 3px rgba(0, 0, 0, 0.5);
+  --menu-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 14px 30px rgba(0, 0, 0, 0.55);
+  --track-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
+  --thumb-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.25);
+  --knob-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+
+  /* Ink */
   --porcelain: #eef1f4;
   --fog: #8b939c;
   --dim: #59616a;
+
+  /* Mode tints and signals */
   --signal: #ff9f8a;
   --frost: #a7d7f1;
   --mint: #a5e1cd;
   --mist: #d5dce3;
   --amber: #efd09a;
+  --ember: #f3b58f;
+  --on-tint: #0d1a26;
+  --accent-off: #9aa2ab;
+  --warning-text: #d5dce3;
+
+  /* Controls */
+  --switch-off: #2a3037;
+  --switch-knob: #c3cad1;
+  --switch-knob-on: #ffffff;
+  --thumb-top: #fbfcfd;
+  --thumb-bottom: #dce2e8;
+  --dot-off: #343b43;
+  --meter-track: #2a3037;
+
+  /* Charts */
+  --chart-bar: #56616c;
+  --chart-grid: rgba(255, 255, 255, 0.1);
+
+  /* The AC unit in the scene (gradient stops are set from these in the rules further down) */
+  --spot: #ffffff;
+  --spot-opacity: 0.07;
+  --unit-body-top: #ffffff;
+  --unit-body-mid: #f2f4f6;
+  --unit-body-low: #dde2e7;
+  --unit-curve-left: 0.14;
+  --unit-curve-right: 0.16;
+  --unit-under-top: #c9d0d7;
+  --unit-under-low: #9ea7b1;
+  --unit-edge: transparent;
+  --unit-edge-width: 0;
+  --unit-flap: #e2e7ec;
+  --unit-hole: #a2abb5;
+  --unit-hole-lit: #2b5f80;
+  --unit-display: #6fc3ee;
+  --unit-filter: none;
+  --unit-filter-off: brightness(0.84) saturate(0.85);
+  --contact: #000000;
+  --contact-opacity: 0.6;
+  --glow-opacity: 0.14;
+
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    /* Surfaces: a soft porcelain card, white cards on it, pale grey wells */
+    --graphite: #e4e8ed;
+    --graphite-glow: #f3f5f8;
+    --graphite-glow-clear: rgba(243, 245, 248, 0);
+    --slate: #f4f6f8;
+    --slate-raised: #ffffff;
+    --field: #e8ecf0;
+    --hairline: rgba(24, 36, 50, 0.09);
+    --wash: rgba(24, 36, 50, 0.05);
+    --wash-strong: rgba(24, 36, 50, 0.1);
+    --wash-faint: rgba(24, 36, 50, 0.03);
+    --wash-cell: rgba(24, 36, 50, 0.04);
+    --wash-item: rgba(24, 36, 50, 0.06);
+    --ring-strong: rgba(24, 36, 50, 0.14);
+    --hover-mix: #161b21;
+    --focus-mix: #0b1620;
+    --accent-lift: #0b1620;
+    --scrollbar: rgba(24, 36, 50, 0.24);
+
+    --panel-shadow:
+      inset 0 0 0 1px rgba(24, 36, 50, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      0 10px 24px rgba(24, 36, 50, 0.26),
+      0 1px 3px rgba(24, 36, 50, 0.3);
+    --menu-shadow: inset 0 0 0 1px rgba(24, 36, 50, 0.1), 0 14px 30px rgba(24, 36, 50, 0.28);
+    --track-shadow: inset 0 1px 3px rgba(24, 36, 50, 0.16);
+    --thumb-shadow:
+      0 2px 6px rgba(24, 36, 50, 0.32),
+      0 0 0 1px rgba(24, 36, 50, 0.16);
+    --knob-shadow: 0 1px 3px rgba(24, 36, 50, 0.35);
+
+    /* Ink */
+    --porcelain: #161b21;
+    --fog: #505a65;
+    --dim: #5d6772;
+
+    /* Deeper tints, so lines and icons stay visible on a light surface and white text fits on a filled button */
+    --signal: #b8321f;
+    --frost: #1d78ad;
+    --mint: #17785a;
+    --mist: #5b6978;
+    --amber: #9a6205;
+    --ember: #b4471a;
+    --on-tint: #ffffff;
+    --accent-off: #78838f;
+    --warning-text: #3a4550;
+
+    --switch-off: #828d99;
+    --switch-knob: #ffffff;
+    --thumb-top: #ffffff;
+    --thumb-bottom: #e6ebf0;
+    --dot-off: #c3cbd3;
+    --meter-track: #d5dbe2;
+
+    --chart-bar: #828d99;
+    --chart-grid: rgba(24, 36, 50, 0.12);
+
+    /* The unit stays porcelain white, but gets an edge, a shadow and darker ends to stand off a light card. */
+    --spot-opacity: 0.45;
+    --unit-body-mid: #f3f5f7;
+    --unit-body-low: #e0e5ea;
+    --unit-curve-left: 0.2;
+    --unit-curve-right: 0.22;
+    --unit-edge: rgba(24, 40, 58, 0.26);
+    --unit-edge-width: 1;
+    --unit-flap: #d5dce3;
+    --unit-display: #0c6fa8;
+    --unit-filter: drop-shadow(0 2px 2.5px rgba(24, 36, 50, 0.22));
+    --unit-filter-off: brightness(0.92) saturate(0.85) drop-shadow(0 2px 2.5px rgba(24, 36, 50, 0.22));
+    --contact: #1b2c3c;
+    --contact-opacity: 0.32;
+    --glow-opacity: 0.18;
+  }
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Component display rules would otherwise win over the hidden attribute. */
+[hidden] {
+  display: none !important;
 }
 
 html,
@@ -61,7 +221,7 @@ button:disabled {
 }
 
 :focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent) 70%, white);
+  outline: 2px solid color-mix(in srgb, var(--accent) 70%, var(--focus-mix));
   outline-offset: 2px;
 }
 
@@ -77,7 +237,7 @@ svg.lucide {
 
 .panel {
   --tint: var(--frost);
-  --accent: #9aa2ab;
+  --accent: var(--accent-off);
   --flow-duration: 2.4s;
   --flow-strength: 0.85;
   position: relative;
@@ -86,13 +246,9 @@ svg.lucide {
   overflow: hidden;
   border-radius: 26px;
   background:
-    radial-gradient(130% 60% at 50% 0%, #1c2128 0%, rgba(28, 33, 40, 0) 72%),
+    radial-gradient(130% 60% at 50% 0%, var(--graphite-glow) 0%, var(--graphite-glow-clear) 72%),
     var(--graphite);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 10px 22px rgba(0, 0, 0, 0.45),
-    0 1px 3px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--panel-shadow);
 }
 
 .panel[data-mode='dry'] {
@@ -105,6 +261,10 @@ svg.lucide {
 
 .panel[data-mode='auto'] {
   --tint: var(--amber);
+}
+
+.panel[data-mode='heat'] {
+  --tint: var(--ember);
 }
 
 .panel[data-power='on'] {
@@ -144,7 +304,15 @@ svg.lucide {
   animation-play-state: paused !important;
 }
 
-.panel[data-loading='true'] :is(.power, .pill, .slider-row, .strip) {
+.panel[data-online='false'] .hero {
+  opacity: 0.4;
+}
+
+.panel[data-online='false'] .setpoint-value {
+  color: var(--fog);
+}
+
+.panel:is([data-loading='true'], [data-online='false']) :is(.power, .pill, .slider-row, .strip) {
   opacity: 0.35;
   pointer-events: none;
 }
@@ -223,8 +391,8 @@ svg.lucide {
   border-radius: 50%;
   font-size: 18px;
   color: var(--fog);
-  background: rgba(255, 255, 255, 0.025);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  background: var(--wash-faint);
+  box-shadow: inset 0 0 0 1px var(--ring-strong);
   transition:
     color 0.3s,
     background 0.3s,
@@ -234,7 +402,7 @@ svg.lucide {
 
 .power:hover {
   color: var(--porcelain);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--wash);
 }
 
 .power:active {
@@ -273,35 +441,79 @@ svg.lucide {
 }
 
 .panel[data-power='on'] .mode-glow {
-  opacity: 0.14;
+  opacity: var(--glow-opacity);
 }
 
 .contact {
-  fill: #000000;
-  opacity: 0.6;
+  fill: var(--contact);
+  opacity: var(--contact-opacity);
 }
 
 .unit {
+  filter: var(--unit-filter);
   transition: filter 0.6s;
 }
 
 .panel[data-power='off'] .unit {
-  filter: brightness(0.84) saturate(0.85);
+  filter: var(--unit-filter-off);
+}
+
+/* The unit is drawn with gradients whose stops are coloured here, so the theme can reach them. */
+.spot-core,
+.spot-edge {
+  stop-color: var(--spot);
+}
+
+.spot-core {
+  stop-opacity: var(--spot-opacity);
+}
+
+.body-top {
+  stop-color: var(--unit-body-top);
+}
+
+.body-mid {
+  stop-color: var(--unit-body-mid);
+}
+
+.body-low {
+  stop-color: var(--unit-body-low);
+}
+
+.curve-left {
+  stop-opacity: var(--unit-curve-left);
+}
+
+.curve-right {
+  stop-opacity: var(--unit-curve-right);
+}
+
+.under-top {
+  stop-color: var(--unit-under-top);
+}
+
+.under-low {
+  stop-color: var(--unit-under-low);
+}
+
+.unit-edge {
+  stroke: var(--unit-edge);
+  stroke-width: var(--unit-edge-width);
 }
 
 .hole {
-  fill: #a2abb5;
+  fill: var(--unit-hole);
   transition: fill 0.8s;
 }
 
 .panel[data-power='on'][data-windfree='true'] .hole {
-  fill: color-mix(in srgb, var(--tint) 55%, #2b5f80);
+  fill: color-mix(in srgb, var(--tint) 55%, var(--unit-hole-lit));
 }
 
 .unit-display {
   font: 600 10px Bahnschrift, system-ui, sans-serif;
   letter-spacing: 0.04em;
-  fill: #6fc3ee;
+  fill: var(--unit-display);
   opacity: 0;
   transition: opacity 0.5s;
 }
@@ -311,7 +523,7 @@ svg.lucide {
 }
 
 .flap {
-  fill: #e2e7ec;
+  fill: var(--unit-flap);
   transform-box: fill-box;
   transform-origin: 50% 0%;
   transition: transform 0.9s var(--ease-out);
@@ -527,7 +739,7 @@ svg.lucide {
   width: 38px;
   height: 24px;
   border-radius: 999px;
-  background: #2a3037;
+  background: var(--switch-off);
   transition: background 0.3s;
 }
 
@@ -539,8 +751,8 @@ svg.lucide {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #c3cad1;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  background: var(--switch-knob);
+  box-shadow: var(--knob-shadow);
   transition:
     transform 0.3s var(--ease-out),
     background 0.3s;
@@ -551,7 +763,7 @@ svg.lucide {
 }
 
 :is([aria-checked='true'] > .switch, .switch[aria-checked='true'])::after {
-  background: #ffffff;
+  background: var(--switch-knob-on);
   transform: translateX(14px);
 }
 
@@ -607,7 +819,7 @@ svg.lucide {
     var(--slate);
   box-shadow:
     inset 0 0 0 1px var(--hairline),
-    inset 0 1px 3px rgba(0, 0, 0, 0.45);
+    var(--track-shadow);
   transition: --pct 0.3s var(--ease-out);
 }
 
@@ -634,10 +846,8 @@ svg.lucide {
   height: 28px;
   margin-top: 6px;
   border-radius: 7px;
-  background: linear-gradient(#fbfcfd, #dce2e8);
-  box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(0, 0, 0, 0.25);
+  background: linear-gradient(var(--thumb-top), var(--thumb-bottom));
+  box-shadow: var(--thumb-shadow);
   transition: transform 0.15s;
   appearance: none;
 }
@@ -659,7 +869,8 @@ svg.lucide {
 
 .strip {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
   margin: 14px 14px 0;
   overflow: hidden;
   border-radius: 18px;
@@ -684,7 +895,7 @@ svg.lucide {
 
 .cell:hover,
 .cell[aria-expanded='true'] {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--wash-cell);
 }
 
 .cell-top {
@@ -720,7 +931,7 @@ svg.lucide {
   height: 7px;
   margin-right: 3px;
   border-radius: 50%;
-  background: #343b43;
+  background: var(--dot-off);
   transition:
     background 0.3s,
     box-shadow 0.3s;
@@ -758,7 +969,8 @@ svg.lucide {
 }
 
 .status-message {
-  display: inline-flex;
+  display: flex;
+  flex: 1;
   align-items: center;
   gap: 7px;
   min-width: 0;
@@ -766,19 +978,39 @@ svg.lucide {
   color: var(--fog);
 }
 
-.status-message > span:not(.status-icon) {
+.status-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+
+.status-body > span:first-child {
+  max-width: 100%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
+/* A quiet line with no links below it has room for a second line: a timer of another unit names that unit, and the name
+   is the part that must not be cut. */
+.status-message[data-tone='quiet'] .status-body > span:first-child {
+  display: -webkit-box;
+  white-space: normal;
+  text-overflow: clip;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 .status-icon {
   display: grid;
+  flex: none;
   font-size: 15px;
 }
 
 .status-message[data-tone='ok'] .status-icon {
-  color: color-mix(in srgb, var(--accent) 80%, white);
+  color: color-mix(in srgb, var(--accent) 80%, var(--accent-lift));
 }
 
 .status-message[data-tone='busy'] .status-icon {
@@ -789,12 +1021,27 @@ svg.lucide {
   color: var(--signal);
 }
 
-.status-retry {
-  flex: none;
-  font-size: 13px;
+.status-actions {
+  display: flex;
+  gap: 14px;
+}
+
+.status-actions:not(:has(:not([hidden]))) {
+  display: none;
+}
+
+.status-link {
+  font-size: 12px;
   color: var(--porcelain);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.footer-tools {
+  display: flex;
+  flex: none;
+  align-items: center;
+  margin-left: auto;
 }
 
 @keyframes spin {
@@ -819,7 +1066,35 @@ svg.lucide {
 
 .icon-button:hover {
   color: var(--porcelain);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--wash);
+}
+
+.icon-button:disabled {
+  opacity: 0.35;
+}
+
+.icon-button.small {
+  width: 30px;
+  height: 30px;
+  font-size: 16px;
+}
+
+/* A dot on the clock tells that a timer is running. */
+.icon-button[data-active='true'] {
+  position: relative;
+  color: var(--porcelain);
+}
+
+.icon-button[data-active='true']::after {
+  content: '';
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--graphite);
 }
 
 /* Option menu */
@@ -828,12 +1103,11 @@ svg.lucide {
   position: absolute;
   z-index: 10;
   min-width: 190px;
+  max-width: 320px;
   padding: 6px;
   border-radius: 15px;
   background: var(--slate-raised);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 14px 30px rgba(0, 0, 0, 0.55);
+  box-shadow: var(--menu-shadow);
   transform-origin: bottom left;
   animation: menu-in 0.16s var(--ease-out);
 }
@@ -867,7 +1141,7 @@ svg.lucide {
 .menu-item:focus-visible {
   outline: none;
   color: var(--porcelain);
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--wash-item);
 }
 
 .menu-item[aria-checked='true'] {
@@ -882,13 +1156,225 @@ svg.lucide {
   color: var(--accent);
 }
 
+/* Popup content: favourites and timer */
+
+.menu[data-align='right'] {
+  transform-origin: bottom right;
+}
+
+.menu[role='dialog'] {
+  width: 240px;
+}
+
+.menu-error {
+  margin: 6px 10px 6px;
+  font-size: 12px;
+  color: var(--signal);
+}
+
+.menu-title {
+  padding: 6px 10px 8px;
+  font-size: 12px;
+  color: var(--fog);
+}
+
+.menu-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 8px;
+  font-size: 13px;
+  color: var(--porcelain);
+}
+
+.menu-note svg.lucide {
+  font-size: 15px;
+  color: var(--accent);
+}
+
+.menu-empty {
+  margin: 0;
+  padding: 6px 10px 10px;
+  font-size: 13px;
+  color: var(--fog);
+}
+
+.menu-separator {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--hairline);
+}
+
+.fav-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 168px;
+  overflow-y: auto;
+}
+
+.fav-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.fav-apply {
+  flex: 1;
+  grid-template-columns: 18px 1fr;
+  min-width: 0;
+  height: 44px;
+}
+
+.fav-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.fav-name {
+  overflow: hidden;
+  font-size: 14px;
+  color: var(--porcelain);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.fav-detail {
+  display: flex;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--fog);
+}
+
+.fav-detail > span + span::before {
+  content: '·';
+  margin-right: 6px;
+}
+
+.menu-delete {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 15px;
+  color: var(--fog);
+}
+
+.menu-delete:hover,
+.menu-delete:focus-visible {
+  outline: none;
+  color: var(--signal);
+  background: var(--wash);
+}
+
+.menu-save {
+  color: var(--porcelain);
+}
+
+.fav-form {
+  display: flex;
+  gap: 6px;
+  padding: 4px 4px 2px;
+}
+
+.fav-form .field {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Signed-out card */
+
+.login-card {
+  display: none;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+  padding: 0 32px;
+}
+
+.login-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.login-badge {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  font-size: 20px;
+  color: var(--tint);
+  background: color-mix(in srgb, var(--tint) 12%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tint) 40%, transparent);
+}
+
+.login-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.login-title + .btn {
+  margin-top: 10px;
+}
+
+.login-text {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--fog);
+}
+
+.login-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.35;
+  text-align: left;
+  color: var(--signal);
+  background: color-mix(in srgb, var(--signal) 10%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--signal) 24%, transparent);
+}
+
+.login-error-icon {
+  display: grid;
+  flex: none;
+  font-size: 16px;
+}
+
+.panel:is([data-login='needed'], [data-login='waiting']) :is(.top, .setpoint-row, .slider-row, .scale, .strip) {
+  display: none;
+}
+
+.panel:is([data-login='needed'], [data-login='waiting']) .hero {
+  margin-top: 24px;
+}
+
+.panel:is([data-login='needed'], [data-login='waiting']) .login-card {
+  display: flex;
+}
+
 /* Settings */
 
 .view-settings {
   gap: 12px;
-  padding: 14px 14px 16px;
+  padding: 14px 0 0;
   background:
-    radial-gradient(130% 60% at 50% 0%, #1c2128 0%, rgba(28, 33, 40, 0) 72%),
+    radial-gradient(130% 60% at 50% 0%, var(--graphite-glow) 0%, var(--graphite-glow-clear) 72%),
     var(--graphite);
   transform: translateX(104%);
   transition: transform 0.34s var(--ease-out);
@@ -900,9 +1386,11 @@ svg.lucide {
 
 .settings-top {
   display: flex;
+  flex: none;
   align-items: center;
   gap: 4px;
   height: 40px;
+  padding: 0 14px;
 }
 
 .settings-heading {
@@ -918,12 +1406,17 @@ svg.lucide {
   line-height: 1.1;
 }
 
+.settings-heading h1:focus {
+  outline: none;
+}
+
 .settings-device {
   font-size: 12px;
   color: var(--fog);
 }
 
 .group {
+  overflow: hidden;
   border-radius: 16px;
   background: var(--slate);
   box-shadow: inset 0 0 0 1px var(--hairline);
@@ -938,7 +1431,7 @@ svg.lucide {
   padding: 10px 14px;
 }
 
-.row + .row {
+.row:not([hidden]) ~ .row:not([hidden]) {
   box-shadow: inset 0 1px 0 var(--hairline);
 }
 
@@ -975,7 +1468,7 @@ svg.lucide {
   margin-top: 6px;
   overflow: hidden;
   border-radius: 2px;
-  background: #2a3037;
+  background: var(--meter-track);
 }
 
 .meter > span {

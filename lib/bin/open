@@ -1,0 +1,8 @@
+#!/bin/sh
+# Stands in for /usr/bin/open on every run but the explicit sign-in, so the SmartThings CLI cannot start a browser by itself.
+# The CLI only calls open to begin its sign-in and then waits up to ten minutes, so it is ended here and ac.mjs
+# finds the marker and reports that a sign-in is needed.
+# Without the marker variable nobody asked for this, so it is just the real open.
+[ -z "$WINDFREE_OPEN_MARKER" ] && exec /usr/bin/open "$@"
+: > "$WINDFREE_OPEN_MARKER"
+kill -KILL "$PPID"

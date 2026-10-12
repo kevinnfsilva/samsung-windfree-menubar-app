@@ -2,26 +2,28 @@
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
+    <meta name="color-scheme" content="light dark" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:" />
     <title>WindFree</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="pages.css" />
   </head>
   <body>
     <main class="panel" id="panel" data-loading="true" data-power="off" data-mode="cool" data-fan="auto" data-swing="fixed" data-windfree="false">
       <section class="view view-main">
         <header class="top">
           <div class="readings">
-            <span class="reading">
+            <span class="reading" id="reading-room">
               <i data-lucide="thermometer"></i>
-              <span class="reading-label">Ambiente</span>
+              <span class="reading-label" data-i18n="main.room"></span>
               <strong id="room-temp">--</strong>
             </span>
-            <span class="reading" title="Umidade do ambiente">
+            <span class="reading" id="reading-humidity" data-i18n-title="main.humidity">
               <i data-lucide="droplet"></i>
               <strong id="room-humidity">--</strong>
             </span>
           </div>
-          <button class="power" id="power" type="button" aria-label="Ligar o ar">
+          <button class="power" id="power" type="button" data-i18n-aria-label="main.powerOn">
             <i data-lucide="power"></i>
           </button>
         </header>
@@ -30,23 +32,23 @@
           <svg class="scene" viewBox="0 8 320 156">
             <defs>
               <radialGradient id="g-spot" cx="50%" cy="38%" r="60%">
-                <stop offset="0" stop-color="#ffffff" stop-opacity="0.07" />
-                <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+                <stop class="spot-core" offset="0" />
+                <stop class="spot-edge" offset="1" stop-opacity="0" />
               </radialGradient>
               <linearGradient id="g-body" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#ffffff" />
-                <stop offset="0.5" stop-color="#f2f4f6" />
-                <stop offset="1" stop-color="#dde2e7" />
+                <stop class="body-top" offset="0" />
+                <stop class="body-mid" offset="0.5" />
+                <stop class="body-low" offset="1" />
               </linearGradient>
               <linearGradient id="g-curve" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0" stop-color="#0d1a26" stop-opacity="0.14" />
+                <stop class="curve-left" offset="0" stop-color="#0d1a26" />
                 <stop offset="0.09" stop-color="#0d1a26" stop-opacity="0" />
                 <stop offset="0.88" stop-color="#0d1a26" stop-opacity="0" />
-                <stop offset="1" stop-color="#0d1a26" stop-opacity="0.16" />
+                <stop class="curve-right" offset="1" stop-color="#0d1a26" />
               </linearGradient>
               <linearGradient id="g-under" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#c9d0d7" />
-                <stop offset="1" stop-color="#9ea7b1" />
+                <stop class="under-top" offset="0" />
+                <stop class="under-low" offset="1" />
               </linearGradient>
               <linearGradient id="g-outlet" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0" stop-color="#07090b" />
@@ -107,12 +109,12 @@
             <ellipse class="contact" cx="160" cy="99" rx="116" ry="4.5" filter="url(#f-contact)" />
 
             <g class="unit">
-              <rect x="40" y="20" width="240" height="62" rx="14" fill="url(#g-body)" />
+              <rect class="unit-edge" x="40" y="20" width="240" height="62" rx="14" fill="url(#g-body)" />
               <rect x="40" y="20" width="240" height="62" rx="14" fill="url(#g-curve)" />
               <path d="M54 21.4 H266" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" />
               <rect class="holes" x="52" y="50" width="216" height="26" rx="8" fill="url(#p-holes)" mask="url(#m-holes)" />
               <text class="unit-display" id="unit-display" x="265" y="40" text-anchor="end" filter="url(#f-glow)">--</text>
-              <path d="M46 80 H274 C274 88 268 94.5 258 95.5 H62 C52 94.5 46 88 46 80 Z" fill="url(#g-under)" />
+              <path class="unit-edge" d="M46 80 H274 C274 88 268 94.5 258 95.5 H62 C52 94.5 46 88 46 80 Z" fill="url(#g-under)" />
               <rect x="70" y="84.5" width="180" height="7.5" rx="3.75" fill="url(#g-outlet)" />
               <rect class="flap" x="68" y="83.5" width="184" height="9.5" rx="4.75" />
             </g>
@@ -132,6 +134,28 @@
           </svg>
         </figure>
 
+        <section class="login-card" id="login-card" aria-live="polite">
+          <div class="login-body" id="login-needed">
+            <span class="login-badge"><i data-lucide="user-round"></i></span>
+            <h2 class="login-title" data-i18n="login.title"></h2>
+            <p class="login-text" data-i18n="login.text"></p>
+            <p class="login-error" role="alert" hidden>
+              <span class="login-error-icon"></span>
+              <span class="login-error-text"></span>
+            </p>
+            <button class="btn btn-primary" id="login" type="button" data-i18n="login.button"></button>
+          </div>
+          <div class="login-body" id="login-waiting" hidden>
+            <span class="login-badge spinning"><i data-lucide="loader-circle"></i></span>
+            <h2 class="login-title" data-i18n="login.waiting"></h2>
+            <p class="login-error" role="alert" hidden>
+              <span class="login-error-icon"></span>
+              <span class="login-error-text"></span>
+            </p>
+            <button class="btn" id="cancel-login" type="button" data-i18n="login.cancel"></button>
+          </div>
+        </section>
+
         <div class="setpoint-row">
           <div class="setpoint" aria-live="polite">
             <span class="setpoint-value" id="setpoint">--</span>
@@ -145,37 +169,37 @@
         </div>
 
         <div class="slider-row">
-          <button class="round" id="temp-down" type="button" aria-label="Diminuir a temperatura">
+          <button class="round" id="temp-down" type="button" data-i18n-aria-label="main.tempDown">
             <i data-lucide="minus"></i>
           </button>
           <div class="track">
-            <input type="range" id="temp" min="16" max="30" step="1" value="23" aria-label="Temperatura desejada" />
+            <input type="range" id="temp" min="16" max="30" step="1" value="23" data-i18n-aria-label="main.tempInput" />
           </div>
-          <button class="round" id="temp-up" type="button" aria-label="Aumentar a temperatura">
+          <button class="round" id="temp-up" type="button" data-i18n-aria-label="main.tempUp">
             <i data-lucide="plus"></i>
           </button>
         </div>
-        <div class="scale" aria-hidden="true"><span>16°</span><span>30°</span></div>
+        <div class="scale" aria-hidden="true"><span id="scale-min">16°</span><span id="scale-max">30°</span></div>
 
         <div class="strip">
           <button class="cell" type="button" data-menu="modo" aria-haspopup="menu">
             <span class="cell-top"><span class="cell-icon" data-icon-for="modo"></span><i data-lucide="chevron-up" class="cell-chevron"></i></span>
-            <span class="cell-label">Modo</span>
+            <span class="cell-label" data-i18n="main.mode"></span>
             <span class="cell-value" data-value-for="modo">--</span>
           </button>
           <button class="cell" type="button" data-menu="vento" aria-haspopup="menu">
             <span class="cell-top"><span class="cell-icon"><i data-lucide="fan"></i></span><i data-lucide="chevron-up" class="cell-chevron"></i></span>
-            <span class="cell-label">Vento</span>
+            <span class="cell-label" data-i18n="main.fan"></span>
             <span class="cell-value" data-value-for="vento">--</span>
           </button>
           <button class="cell" type="button" id="sleep" role="switch" aria-checked="false">
             <span class="cell-top"><span class="cell-icon"><i data-lucide="moon"></i></span><span class="cell-dot"></span></span>
-            <span class="cell-label">Sono</span>
+            <span class="cell-label" data-i18n="main.sleep"></span>
             <span class="cell-value" data-value-for="sono">--</span>
           </button>
           <button class="cell" type="button" data-menu="oscilar" aria-haspopup="menu">
             <span class="cell-top"><span class="cell-icon" data-icon-for="oscilar"></span><i data-lucide="chevron-up" class="cell-chevron"></i></span>
-            <span class="cell-label">Direção</span>
+            <span class="cell-label" data-i18n="main.swing"></span>
             <span class="cell-value" data-value-for="oscilar">--</span>
           </button>
         </div>
@@ -183,69 +207,285 @@
         <footer class="status">
           <div class="status-message" id="status" data-tone="busy">
             <span class="status-icon" id="status-icon"></span>
-            <span id="status-text">Conectando ao SmartThings…</span>
-            <button class="status-retry" id="retry" type="button" hidden>Tentar de novo</button>
+            <span class="status-body">
+              <span id="status-text" aria-live="polite" aria-atomic="true" data-i18n="status.connecting"></span>
+              <span class="status-actions">
+                <button class="status-link" id="retry" type="button" hidden data-i18n="status.retry"></button>
+                <button class="status-link" id="pick-device" type="button" hidden data-i18n="status.pickDevice"></button>
+              </span>
+            </span>
           </div>
-          <button class="icon-button" id="open-settings" type="button" aria-label="Abrir ajustes">
-            <i data-lucide="sliders-horizontal"></i>
-          </button>
+          <div class="footer-tools">
+            <button class="icon-button tool" id="open-favorites" type="button" data-i18n-aria-label="main.favorites" aria-haspopup="dialog" aria-expanded="false">
+              <i data-lucide="star"></i>
+            </button>
+            <button class="icon-button tool" id="open-timer" type="button" data-i18n-aria-label="main.timer" aria-haspopup="menu" aria-expanded="false">
+              <i data-lucide="clock"></i>
+            </button>
+            <button class="icon-button" id="open-settings" type="button" data-i18n-aria-label="main.openSettings">
+              <i data-lucide="sliders-horizontal"></i>
+            </button>
+          </div>
         </footer>
       </section>
 
-      <section class="view view-settings" id="settings" aria-label="Ajustes" inert>
+      <section class="view view-settings" id="settings" data-i18n-aria-label="page.root" inert>
         <header class="settings-top">
-          <button class="icon-button" id="close-settings" type="button" aria-label="Voltar">
+          <button class="icon-button" id="close-settings" type="button" data-i18n-aria-label="settings.back">
             <i data-lucide="chevron-left"></i>
           </button>
           <div class="settings-heading">
-            <h1>Ajustes</h1>
+            <h1 id="settings-title" tabindex="-1" data-i18n="page.root"></h1>
             <span class="settings-device" id="device-name"></span>
           </div>
         </header>
 
-        <div class="group">
-          <div class="row">
-            <i data-lucide="sun"></i>
-            <span class="row-text"><span class="row-title">Luz do display</span></span>
-            <button class="switch" type="button" role="switch" aria-checked="false" data-setting="display" aria-label="Luz do display"></button>
-          </div>
-          <div class="row">
-            <i data-lucide="volume-2"></i>
-            <span class="row-text"><span class="row-title">Bipe</span><span class="row-note">Apita quando recebe um comando</span></span>
-            <button class="switch" type="button" role="switch" aria-checked="false" data-setting="bipe" aria-label="Bipe"></button>
-          </div>
-          <div class="row">
-            <i data-lucide="wind"></i>
-            <span class="row-text"><span class="row-title">Secagem automática</span><span class="row-note">Seca o aparelho por dentro ao desligar</span></span>
-            <button class="switch" type="button" role="switch" aria-checked="false" data-setting="autoclean" aria-label="Secagem automática"></button>
-          </div>
-        </div>
+        <div class="pages">
+          <section class="page active" id="page-root" data-title-key="page.root">
+            <div class="group">
+              <button class="row row-link" id="row-device" type="button" data-go="device">
+                <i data-lucide="thermometer-snowflake"></i>
+                <span class="row-text"><span class="row-title" data-i18n="page.device"></span><span class="row-note" id="device-row-name">--</span></span>
+                <span class="row-end"><i data-lucide="chevron-right" class="row-chevron"></i></span>
+              </button>
+            </div>
 
-        <div class="group">
-          <div class="row">
-            <i data-lucide="air-vent"></i>
-            <span class="row-text">
-              <span class="row-title" id="filter-title">Filtro</span>
-              <span class="row-note" id="filter-note">--</span>
-              <span class="meter" aria-hidden="true"><span id="filter-meter"></span></span>
-            </span>
-          </div>
-          <div class="row">
-            <i data-lucide="zap"></i>
-            <span class="row-text">
-              <span class="row-title">Consumo</span>
-              <span class="row-note" id="energy-note">--</span>
-            </span>
-            <strong class="row-value" id="power-now">--</strong>
-          </div>
-        </div>
+            <div class="group needs-device" id="group-toggles">
+              <div class="row">
+                <i data-lucide="sun"></i>
+                <span class="row-text"><span class="row-title" data-i18n="settings.display"></span></span>
+                <button class="switch" type="button" role="switch" aria-checked="false" data-setting="display" data-i18n-aria-label="settings.display"></button>
+              </div>
+              <div class="row">
+                <i data-lucide="volume-2"></i>
+                <span class="row-text"><span class="row-title" data-i18n="settings.beep"></span><span class="row-note" data-i18n="settings.beepNote"></span></span>
+                <button class="switch" type="button" role="switch" aria-checked="false" data-setting="bipe" data-i18n-aria-label="settings.beep"></button>
+              </div>
+              <div class="row">
+                <i data-lucide="wind"></i>
+                <span class="row-text"><span class="row-title" data-i18n="settings.autoclean"></span><span class="row-note" data-i18n="settings.autocleanNote"></span></span>
+                <button class="switch" type="button" role="switch" aria-checked="false" data-setting="autoclean" data-i18n-aria-label="settings.autoclean"></button>
+              </div>
+              <div class="row row-wide" id="row-extra">
+                <i data-lucide="gauge"></i>
+                <span class="row-text"><span class="row-title" data-i18n="settings.extra"></span><span class="row-note" data-i18n="settings.extraNote"></span></span>
+                <div class="segmented" id="extra-modes" role="group" data-i18n-aria-label="settings.extra"></div>
+              </div>
+            </div>
 
-        <div class="group">
-          <div class="row">
-            <i data-lucide="monitor"></i>
-            <span class="row-text"><span class="row-title" id="autostart-title">Abrir com o Windows</span></span>
-            <button class="switch" type="button" role="switch" aria-checked="false" id="autostart" aria-label="Abrir com o Windows"></button>
-          </div>
+            <div class="group needs-device" id="group-filter">
+              <div class="row">
+                <i data-lucide="air-vent"></i>
+                <span class="row-text">
+                  <span class="row-title" id="filter-title" data-i18n="filter.title"></span>
+                  <span class="row-note" id="filter-note">--</span>
+                  <span class="meter" aria-hidden="true"><span id="filter-meter"></span></span>
+                </span>
+                <button class="btn btn-small" id="filter-reset" type="button" data-i18n-aria-label="filter.resetLabel" data-i18n="filter.reset"></button>
+              </div>
+              <div class="row row-stack" id="filter-confirm" role="group" data-i18n-aria-label="filter.confirmGroup" hidden>
+                <span class="row-text">
+                  <span class="row-title" data-i18n="filter.confirmTitle"></span>
+                  <span class="row-note" data-i18n="filter.confirmNote"></span>
+                </span>
+                <span class="row-buttons">
+                  <button class="btn btn-small" id="filter-cancel" type="button" data-i18n="filter.cancel"></button>
+                  <button class="btn btn-small btn-danger" id="filter-confirm-yes" type="button" data-i18n="filter.confirmYes"></button>
+                </span>
+              </div>
+              <div class="row row-wide" id="row-filter-alert">
+                <i data-lucide="bell"></i>
+                <span class="row-text"><span class="row-title" data-i18n="filter.alert"></span><span class="row-note" data-i18n="filter.alertNote"></span></span>
+                <div class="segmented" id="filter-alerts" role="group" data-i18n-aria-label="filter.alertLabel"></div>
+              </div>
+            </div>
+
+            <div class="group">
+              <button class="row row-link needs-device" id="row-history" type="button" data-go="history">
+                <i data-lucide="zap"></i>
+                <span class="row-text"><span class="row-title" data-i18n="page.history"></span><span class="row-note" id="energy-note">--</span></span>
+                <span class="row-end"><strong class="row-value" id="power-now">--</strong><i data-lucide="chevron-right" class="row-chevron"></i></span>
+              </button>
+              <button class="row row-link" type="button" data-go="schedules">
+                <i data-lucide="calendar-clock"></i>
+                <span class="row-text"><span class="row-title" data-i18n="page.schedules"></span><span class="row-note" data-i18n="settings.schedulesNote"></span></span>
+                <span class="row-end"><i data-lucide="chevron-right" class="row-chevron"></i></span>
+              </button>
+              <button class="row row-link needs-device" type="button" data-go="advanced">
+                <i data-lucide="flask-conical"></i>
+                <span class="row-text"><span class="row-title" data-i18n="page.advanced"></span><span class="row-note" data-i18n="settings.advancedNote"></span></span>
+                <span class="row-end"><i data-lucide="chevron-right" class="row-chevron"></i></span>
+              </button>
+              <button class="row row-link" type="button" data-go="prefs">
+                <i data-lucide="settings"></i>
+                <span class="row-text"><span class="row-title" data-i18n="page.prefs"></span><span class="row-note" data-i18n="settings.prefsNote"></span></span>
+                <span class="row-end"><i data-lucide="chevron-right" class="row-chevron"></i></span>
+              </button>
+            </div>
+          </section>
+
+          <section class="page" id="page-device" data-title-key="page.device" inert>
+            <div class="page-status" id="devices-loading">
+              <span class="spinning"><i data-lucide="loader-circle"></i></span>
+              <span data-i18n="devices.loading"></span>
+            </div>
+            <div class="group" id="devices-list" role="radiogroup" data-i18n-aria-label="page.device" hidden></div>
+            <p class="page-note" id="devices-empty" hidden data-i18n="devices.empty"></p>
+          </section>
+
+          <section class="page" id="page-history" data-title-key="page.history" inert>
+            <div class="page-status" id="history-loading">
+              <span class="spinning"><i data-lucide="loader-circle"></i></span>
+              <span data-i18n="history.loading"></span>
+            </div>
+            <div class="empty-state" id="history-empty" hidden>
+              <span class="empty-badge"><i data-lucide="chart-column"></i></span>
+              <strong class="empty-title" id="history-empty-title" data-i18n="history.emptyTitle"></strong>
+              <p class="empty-text" id="history-empty-text" data-i18n="history.emptyText"></p>
+            </div>
+            <div class="page-stack" id="history-content" hidden>
+              <div class="group stats">
+                <div class="stat"><span class="stat-label" data-i18n="history.today"></span><strong class="stat-value" id="history-today">--</strong></div>
+                <div class="stat"><span class="stat-label" id="history-total-label"></span><strong class="stat-value" id="history-total">--</strong></div>
+              </div>
+              <div class="group chart-card">
+                <div class="chart-head">
+                  <h2 class="chart-title" data-i18n="history.perDay"></h2>
+                  <span class="chart-readout" id="days-readout"></span>
+                </div>
+                <div id="chart-days"></div>
+              </div>
+              <div class="group chart-card">
+                <div class="chart-head">
+                  <h2 class="chart-title" data-i18n="history.power48"></h2>
+                  <span class="chart-readout" id="power-readout"></span>
+                </div>
+                <div id="chart-power"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="page" id="page-schedules" data-title-key="page.schedules" inert>
+            <div class="group" id="schedules-list" hidden></div>
+            <p class="page-note" id="schedules-empty" data-i18n="schedules.empty"></p>
+            <h2 class="section-title" data-i18n="schedules.newTitle"></h2>
+            <form class="group" id="schedule-form">
+              <div class="row row-field">
+                <label class="row-title" for="schedule-time" data-i18n="schedules.time"></label>
+                <input class="field" type="time" id="schedule-time" value="22:00" required />
+              </div>
+              <div class="row row-stack">
+                <span class="row-title" id="schedule-days-label" data-i18n="schedules.days"></span>
+                <div class="chips" id="schedule-days" role="group" aria-labelledby="schedule-days-label"></div>
+              </div>
+              <div class="row row-stack">
+                <span class="row-title" id="schedule-action-label" data-i18n="schedules.action"></span>
+                <div class="segmented" id="schedule-action" role="group" aria-labelledby="schedule-action-label"></div>
+              </div>
+              <div class="row row-stack" id="schedule-favorite-row" hidden>
+                <span class="row-title" id="schedule-favorite-label" data-i18n="schedules.favoriteLabel"></span>
+                <div class="chips" id="schedule-favorites" role="group" aria-labelledby="schedule-favorite-label"></div>
+              </div>
+              <div class="row row-stack">
+                <button class="btn btn-primary" id="schedule-save" type="submit" data-i18n="schedules.add"></button>
+              </div>
+            </form>
+          </section>
+
+          <section class="page" id="page-advanced" data-title-key="page.advanced" inert>
+            <p class="page-warning">
+              <i data-lucide="triangle-alert"></i>
+              <span data-i18n="advanced.warning"></span>
+            </p>
+            <div class="group needs-device" id="group-advanced">
+              <div class="row" id="row-tropical">
+                <i data-lucide="cloud-moon"></i>
+                <span class="row-text"><span class="row-title" data-i18n="advanced.tropical"></span><span class="row-note" id="tropical-note">--</span></span>
+                <div class="stepper" role="group" data-i18n-aria-label="advanced.tropicalLevel">
+                  <button class="stepper-button" id="tropical-down" type="button" data-i18n-aria-label="advanced.tropicalDown"><i data-lucide="minus"></i></button>
+                  <output class="stepper-value" id="tropical-value">0</output>
+                  <button class="stepper-button" id="tropical-up" type="button" data-i18n-aria-label="advanced.tropicalUp"><i data-lucide="plus"></i></button>
+                </div>
+              </div>
+              <div class="row" id="row-clean">
+                <i data-lucide="brush-cleaning"></i>
+                <span class="row-text">
+                  <span class="row-title" data-i18n="advanced.clean"></span>
+                  <span class="row-note" id="clean-note">--</span>
+                  <span class="meter" id="clean-meter" aria-hidden="true" hidden><span></span></span>
+                </span>
+                <button class="btn btn-small" id="clean-toggle" type="button" data-i18n="advanced.start"></button>
+              </div>
+              <div class="row" id="row-diagnosis">
+                <i data-lucide="stethoscope"></i>
+                <span class="row-text">
+                  <span class="row-title" data-i18n="advanced.diagnosis"></span>
+                  <span class="row-note" id="diagnosis-note">--</span>
+                  <span class="tags" id="diagnosis-errors"></span>
+                </span>
+                <button class="btn btn-small" id="diagnosis-toggle" type="button" data-i18n="advanced.start"></button>
+              </div>
+            </div>
+            <p class="page-note" id="advanced-empty" hidden data-i18n="advanced.empty"></p>
+          </section>
+
+          <section class="page" id="page-prefs" data-title-key="page.prefs" inert>
+            <div class="group">
+              <div class="row">
+                <i data-lucide="bell"></i>
+                <span class="row-text"><span class="row-title" data-i18n="prefs.filter"></span><span class="row-note" data-i18n="prefs.filterNote"></span></span>
+                <button class="switch" type="button" role="switch" aria-checked="false" data-pref="notificacoes.filtro" data-i18n-aria-label="prefs.filter"></button>
+              </div>
+              <div class="row">
+                <i data-lucide="wifi-off"></i>
+                <span class="row-text"><span class="row-title" data-i18n="prefs.offline"></span><span class="row-note" data-i18n="prefs.offlineNote"></span></span>
+                <button class="switch" type="button" role="switch" aria-checked="false" data-pref="notificacoes.offline" data-i18n-aria-label="prefs.offline"></button>
+              </div>
+              <div class="row row-wide">
+                <i data-lucide="clock-alert"></i>
+                <span class="row-text"><span class="row-title" data-i18n="prefs.onFor"></span><span class="row-note" data-i18n="prefs.onForNote"></span></span>
+                <div class="segmented" id="on-hours" role="group" data-i18n-aria-label="prefs.onFor"></div>
+              </div>
+            </div>
+
+            <div class="group">
+              <div class="row">
+                <i data-lucide="keyboard"></i>
+                <span class="row-text">
+                  <span class="row-title" data-i18n="prefs.shortcut"></span>
+                  <span class="row-note" data-i18n="prefs.shortcutNote"></span>
+                  <span class="row-note row-problem" id="shortcut-error" role="alert" hidden data-i18n="prefs.shortcutError"></span>
+                </span>
+                <span class="row-end">
+                  <kbd class="keys" id="shortcut-keys"></kbd>
+                  <button class="switch" type="button" role="switch" aria-checked="false" data-pref="atalho.ativo" data-i18n-aria-label="prefs.shortcut"></button>
+                </span>
+              </div>
+              <div class="row" id="row-room-icon" hidden>
+                <i data-lucide="thermometer"></i>
+                <span class="row-text"><span class="row-title" data-i18n="prefs.roomIcon"></span></span>
+                <button class="switch" type="button" role="switch" aria-checked="false" data-pref="icone.ambiente" data-i18n-aria-label="prefs.roomIcon"></button>
+              </div>
+            </div>
+
+            <div class="group">
+              <div class="row">
+                <i data-lucide="monitor"></i>
+                <span class="row-text"><span class="row-title" id="autostart-title" data-i18n="autostart.windows"></span></span>
+                <button class="switch" type="button" role="switch" aria-checked="false" data-pref="autostart" id="autostart" data-i18n-aria-label="autostart.windows"></button>
+              </div>
+              <div class="row" id="row-dock" hidden>
+                <i data-lucide="dock"></i>
+                <span class="row-text"><span class="row-title" data-i18n="prefs.dock"></span></span>
+                <button class="switch" type="button" role="switch" aria-checked="false" data-pref="dock" data-i18n-aria-label="prefs.dock"></button>
+              </div>
+              <div class="row row-wide">
+                <i data-lucide="languages"></i>
+                <span class="row-text"><span class="row-title" data-i18n="prefs.language"></span></span>
+                <div class="segmented" id="language" role="group" data-i18n-aria-label="prefs.language"></div>
+              </div>
+            </div>
+          </section>
         </div>
       </section>
 
@@ -253,6 +493,25 @@
     </main>
 
     <script src="../node_modules/lucide/dist/umd/lucide.min.js"></script>
+    <script src="../locales/pt-BR.js"></script>
+    <script src="../locales/en.js"></script>
+    <script src="i18n.js"></script>
+    <script src="util.js"></script>
+    <script src="labels.js"></script>
+    <script src="store.js"></script>
+    <script src="scene.js"></script>
+    <script src="tray-icon.js"></script>
+    <script src="popup.js"></script>
+    <script src="main-view.js"></script>
+    <script src="favorites.js"></script>
+    <script src="timer.js"></script>
+    <script src="settings.js"></script>
+    <script src="page-device.js"></script>
+    <script src="page-history.js"></script>
+    <script src="page-schedules.js"></script>
+    <script src="page-advanced.js"></script>
+    <script src="page-prefs.js"></script>
+    <script src="keyboard.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
